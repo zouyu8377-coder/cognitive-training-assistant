@@ -11,6 +11,27 @@
           <li v-if="store.state.settings.includeSingingTask">跟唱记录</li>
         </ul>
       </ResultCard>
+
+      <ResultCard v-if="todaySessions.length > 0">
+        <h2>今天已有保存记录</h2>
+        <p>今天已经保存过 {{ todaySessions.length }} 次训练记录。可以先查看历史，也可以继续开始一组新的训练。</p>
+        <RouterLink to="/history"><AppButton tone="secondary" block>查看今日记录</AppButton></RouterLink>
+      </ResultCard>
+
+      <ResultCard>
+        <h2>开始前确认</h2>
+        <p class="muted">请家属简单看一下今天状态。这里只用于调整练习节奏，不做医学判断。</p>
+        <div class="status-options">
+          <label v-for="item in statusOptions" :key="item.value" class="status-option">
+            <input v-model="preStatus" type="radio" :value="item.value" />
+            <span>{{ item.label }}</span>
+          </label>
+        </div>
+        <p v-if="preStatus !== 'steady'" class="notice small">
+          今天可以从短练习开始，必要时减少题量或只做容易完成的任务。
+        </p>
+      </ResultCard>
+
       <AppButton v-if="store.state.currentSession" tone="secondary" block @click="continueDraft">
         继续未完成训练
       </AppButton>
@@ -21,20 +42,31 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppButton from '../components/AppButton.vue';
 import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
+import type { PreTrainingStatus } from '../types';
+import { todayKey } from '../utils/date';
+import { preTrainingStatusText } from '../utils/sessionInsights';
+import { loadSessions } from '../utils/storage';
 import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
+const preStatus = ref<PreTrainingStatus>('steady');
+const todaySessions = loadSessions().filter((session) => session.date === todayKey());
+const statusOptions = (Object.keys(preTrainingStatusText) as PreTrainingStatus[]).map((value) => ({
+  value,
+  label: preTrainingStatusText[value],
+}));
 
 function start() {
   store.discardCurrentSession();
-  store.startTodaySession();
+  store.startTodaySession(preStatus.value);
   router.push('/math');
 }
 
@@ -52,5 +84,33 @@ h2 {
 li {
   margin: 10px 0;
   font-size: 1.1rem;
+}
+
+.status-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.status-option {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  min-height: 52px;
+  padding: 10px;
+  border: 1px solid #d3ded7;
+  border-radius: 8px;
+  background: #ffffff;
+  font-weight: 800;
+}
+
+.status-option input {
+  width: 22px;
+  height: 22px;
+}
+
+.small {
+  margin-top: 12px;
+  font-size: 0.96rem;
 }
 </style>

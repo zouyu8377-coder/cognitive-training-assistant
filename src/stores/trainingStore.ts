@@ -3,6 +3,7 @@ import type {
   MathQuestion,
   NumberConnectResult,
   PatientMood,
+  PreTrainingStatus,
   TrainingSession,
   TrainingSettings,
 } from '../types';
@@ -39,7 +40,7 @@ export function useTrainingStore() {
     saveSettings(state.settings);
   }
 
-  function startTodaySession() {
+  function startTodaySession(preTrainingStatus: PreTrainingStatus = 'steady') {
     const questions = generateMathQuestions(
       state.settings.mathLevel,
       state.settings.mathQuestionCount,
@@ -50,6 +51,7 @@ export function useTrainingStore() {
       patientNickname: state.settings.patientNickname || defaultSettings.patientNickname,
       date: todayKey(),
       startedAt: new Date().toISOString(),
+      preTrainingStatus,
       mathQuestions: questions,
     };
     persistDraft();

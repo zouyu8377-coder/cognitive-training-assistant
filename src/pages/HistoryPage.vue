@@ -7,7 +7,7 @@
         <RouterLink class="record" :to="`/result/${item.id}`">
           <strong>{{ item.date }}</strong>
           <span>{{ item.completedAt ? '已完成' : '未完成' }}</span>
-          <span>数学：{{ correctCount(item) }} / {{ item.mathQuestions.length }}</span>
+          <span>数学正确：{{ correctCount(item) }} / {{ item.mathQuestions.length }}</span>
           <span>数字顺序：{{ item.numberConnectResult?.completed ? '已完成' : '未完成' }}</span>
           <span>状态：{{ moodText(item.patientMood) }}</span>
         </RouterLink>
