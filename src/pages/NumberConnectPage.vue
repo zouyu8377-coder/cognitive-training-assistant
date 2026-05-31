@@ -38,11 +38,26 @@ const wrongClicks = ref(0);
 const startedAt = Date.now();
 const hint = ref('请先点击 1。');
 
+function shuffledPositions(count: number) {
+  const columns = count <= 5 ? 2 : count <= 10 ? 3 : 4;
+  const rows = Math.ceil(count / columns);
+  const positions = Array.from({ length: count }, (_, index) => {
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    return {
+      x: ((column + 0.5) / columns) * 86 + 7 + (Math.random() - 0.5) * 5,
+      y: ((row + 0.5) / rows) * 82 + 8 + (Math.random() - 0.5) * 5,
+    };
+  });
+  return positions.sort(() => Math.random() - 0.5);
+}
+
+const positions = shuffledPositions(level);
 const dots = ref<NumberDot[]>(
   Array.from({ length: level }, (_, index) => ({
     value: index + 1,
-    x: 10 + Math.random() * 72,
-    y: 8 + Math.random() * 76,
+    x: positions[index].x,
+    y: positions[index].y,
     completed: false,
   })),
 );

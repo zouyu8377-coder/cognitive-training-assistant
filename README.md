@@ -18,6 +18,7 @@ npm run dev
 - 照护者设置训练难度和任务开关。
 - 自动生成今日数学练习和数字顺序练习。
 - 患者按页完成数学题、数字点击、写名字和跟唱记录。
+- 写名字页提供可选触屏书写区，仅用于当场辅助，不保存、不识别、不评分。
 - 家属查看本次训练结果，补充备注和状态。
 - 使用 localStorage 保存历史记录。
 - 提供最近 7 天简要复盘。
@@ -29,3 +30,13 @@ npm run dev
 ## 后续路线
 
 后续可能扩展内容记录在 `docs/future-roadmap.md`。所有扩展都应保持非医疗辅助工具边界。
+
+## 目录结构
+
+- `src/pages`：页面级训练流程。
+- `src/components`：大按钮、容器、结果卡片等通用组件。
+- `src/stores/trainingStore.ts`：当前训练状态和保存逻辑。
+- `src/utils/mathGenerator.ts`：数学题生成。
+- `src/utils/storage.ts`：localStorage 读写。
+- `docs/product-scope.md`：当前产品范围。
+- `docs/future-roadmap.md`：后续路线图。
