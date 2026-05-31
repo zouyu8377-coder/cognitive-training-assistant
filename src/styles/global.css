@@ -47,3 +47,13 @@ a {
   background: #fffdf7;
   line-height: 1.7;
 }
+
+@media (max-width: 520px) {
+  :root {
+    font-size: 17px;
+  }
+
+  .page {
+    padding: 16px;
+  }
+}
