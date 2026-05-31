@@ -84,7 +84,11 @@ const singingText = computed(() => {
 });
 
 function save() {
-  store.saveCaregiverResult(mood.value, note.value);
+  if (session.value && route.params.id) {
+    store.saveExistingResult(session.value, mood.value, note.value);
+  } else {
+    store.saveCaregiverResult(mood.value, note.value);
+  }
   router.push('/history');
 }
 </script>

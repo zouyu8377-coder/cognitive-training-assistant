@@ -7,7 +7,7 @@ import type {
   TrainingSettings,
 } from '../types';
 import { todayKey } from '../utils/date';
-import { defaultSettings, loadSettings, saveSession, saveSettings } from '../utils/storage';
+import { defaultSettings, loadSettings, saveSession, saveSettings, updateSession } from '../utils/storage';
 import { generateMathQuestions } from '../utils/mathGenerator';
 
 interface TrainingState {
@@ -79,6 +79,15 @@ export function useTrainingStore() {
     saveSession(JSON.parse(JSON.stringify(session)) as TrainingSession);
   }
 
+  function saveExistingResult(session: TrainingSession, patientMood: PatientMood, caregiverNote: string) {
+    updateSession({
+      ...session,
+      patientMood,
+      caregiverNote,
+      completedAt: session.completedAt ?? new Date().toISOString(),
+    });
+  }
+
   return {
     state,
     updateSettings,
@@ -90,5 +99,6 @@ export function useTrainingStore() {
     setSingingStatus,
     finishSession,
     saveCaregiverResult,
+    saveExistingResult,
   };
 }

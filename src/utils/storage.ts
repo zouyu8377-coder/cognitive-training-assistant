@@ -43,6 +43,10 @@ export function saveSession(session: TrainingSession): void {
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(next));
 }
 
+export function updateSession(session: TrainingSession): void {
+  saveSession(session);
+}
+
 export function findSession(id: string): TrainingSession | undefined {
   return loadSessions().find((session) => session.id === id);
 }
