@@ -11,7 +11,10 @@
           <li v-if="store.state.settings.includeSingingTask">跟唱记录</li>
         </ul>
       </ResultCard>
-      <AppButton block @click="start">开始训练</AppButton>
+      <AppButton v-if="store.state.currentSession" tone="secondary" block @click="continueDraft">
+        继续未完成训练
+      </AppButton>
+      <AppButton block @click="start">开始新的训练</AppButton>
       <RouterLink to="/setup"><AppButton tone="quiet" block>调整设置</AppButton></RouterLink>
     </section>
   </PageContainer>
@@ -24,13 +27,20 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
+import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
 
 function start() {
+  store.discardCurrentSession();
   store.startTodaySession();
   router.push('/math');
+}
+
+function continueDraft() {
+  if (!store.state.currentSession) return;
+  router.push(nextTaskRoute(store.state.settings, store.state.currentSession));
 }
 </script>
 

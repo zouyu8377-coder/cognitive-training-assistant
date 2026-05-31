@@ -18,13 +18,15 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import { useTrainingStore } from '../stores/trainingStore';
 import type { TrainingSession } from '../types';
+import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
 
 function choose(status: TrainingSession['singingStatus']) {
+  const session = store.ensureSession();
   store.setSingingStatus(status);
-  router.push('/complete');
+  router.push(nextTaskRoute(store.state.settings, session));
 }
 </script>
 

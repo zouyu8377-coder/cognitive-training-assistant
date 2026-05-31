@@ -29,6 +29,7 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import { useTrainingStore } from '../stores/trainingStore';
 import type { NumberDot } from '../types';
+import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
@@ -62,20 +63,15 @@ const dots = ref<NumberDot[]>(
   })),
 );
 
-function nextRoute() {
-  if (store.state.settings.includeWritingTask) return '/writing';
-  if (store.state.settings.includeSingingTask) return '/singing';
-  return '/complete';
-}
-
 function finish(completed: boolean) {
+  const session = store.ensureSession();
   store.setNumberConnectResult({
     level,
     completed,
     wrongClicks: wrongClicks.value,
     durationSeconds: Math.max(1, Math.round((Date.now() - startedAt) / 1000)),
   });
-  router.push(nextRoute());
+  router.push(nextTaskRoute(store.state.settings, session));
 }
 
 function tap(value: number) {

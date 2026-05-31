@@ -30,6 +30,7 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import { useTrainingStore } from '../stores/trainingStore';
 import type { TrainingSession } from '../types';
+import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
@@ -80,8 +81,9 @@ function clearCanvas() {
 }
 
 function choose(status: TrainingSession['writingStatus']) {
+  const session = store.ensureSession();
   store.setWritingStatus(status);
-  router.push(store.state.settings.includeSingingTask ? '/singing' : '/complete');
+  router.push(nextTaskRoute(store.state.settings, session));
 }
 
 onMounted(() => {

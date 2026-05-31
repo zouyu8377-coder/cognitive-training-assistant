@@ -22,12 +22,13 @@ import LargeNumberPad from '../components/LargeNumberPad.vue';
 import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import { useTrainingStore } from '../stores/trainingStore';
+import { firstPendingMathIndex, nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
 const session = store.ensureSession();
 const questions = session.mathQuestions;
-const currentIndex = ref(0);
+const currentIndex = ref(firstPendingMathIndex(session));
 const answer = ref('');
 const startedAt = ref(Date.now());
 const message = ref('输入答案后点下一题。');
@@ -54,7 +55,7 @@ function record(skipped: boolean) {
 
 function moveOn() {
   if (currentIndex.value >= questions.length - 1) {
-    router.push('/number-connect');
+    router.push(nextTaskRoute(store.state.settings, session));
     return;
   }
   currentIndex.value += 1;

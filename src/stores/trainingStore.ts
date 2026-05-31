@@ -7,7 +7,16 @@ import type {
   TrainingSettings,
 } from '../types';
 import { todayKey } from '../utils/date';
-import { defaultSettings, loadSettings, saveSession, saveSettings, updateSession } from '../utils/storage';
+import {
+  clearDraftSession,
+  defaultSettings,
+  loadDraftSession,
+  loadSettings,
+  saveDraftSession,
+  saveSession,
+  saveSettings,
+  updateSession,
+} from '../utils/storage';
 import { generateMathQuestions } from '../utils/mathGenerator';
 
 interface TrainingState {
@@ -17,6 +26,7 @@ interface TrainingState {
 
 const state = reactive<TrainingState>({
   settings: loadSettings(),
+  currentSession: loadDraftSession(),
 });
 
 function newId(): string {
@@ -42,6 +52,7 @@ export function useTrainingStore() {
       startedAt: new Date().toISOString(),
       mathQuestions: questions,
     };
+    persistDraft();
   }
 
   function ensureSession() {
@@ -49,26 +60,35 @@ export function useTrainingStore() {
     return state.currentSession as TrainingSession;
   }
 
+  function persistDraft() {
+    if (state.currentSession) saveDraftSession(JSON.parse(JSON.stringify(state.currentSession)) as TrainingSession);
+  }
+
   function setMathQuestion(index: number, question: MathQuestion) {
     const session = ensureSession();
     session.mathQuestions[index] = question;
+    persistDraft();
   }
 
   function setNumberConnectResult(result: NumberConnectResult) {
     ensureSession().numberConnectResult = result;
+    persistDraft();
   }
 
   function setWritingStatus(status: TrainingSession['writingStatus']) {
     ensureSession().writingStatus = status;
+    persistDraft();
   }
 
   function setSingingStatus(status: TrainingSession['singingStatus']) {
     ensureSession().singingStatus = status;
+    persistDraft();
   }
 
   function finishSession() {
     const session = ensureSession();
     session.completedAt = session.completedAt ?? new Date().toISOString();
+    persistDraft();
   }
 
   function saveCaregiverResult(patientMood: PatientMood, caregiverNote: string) {
@@ -77,6 +97,8 @@ export function useTrainingStore() {
     session.caregiverNote = caregiverNote;
     session.completedAt = session.completedAt ?? new Date().toISOString();
     saveSession(JSON.parse(JSON.stringify(session)) as TrainingSession);
+    clearDraftSession();
+    state.currentSession = undefined;
   }
 
   function saveExistingResult(session: TrainingSession, patientMood: PatientMood, caregiverNote: string) {
@@ -86,6 +108,11 @@ export function useTrainingStore() {
       caregiverNote,
       completedAt: session.completedAt ?? new Date().toISOString(),
     });
+  }
+
+  function discardCurrentSession() {
+    clearDraftSession();
+    state.currentSession = undefined;
   }
 
   return {
@@ -100,5 +127,6 @@ export function useTrainingStore() {
     finishSession,
     saveCaregiverResult,
     saveExistingResult,
+    discardCurrentSession,
   };
 }

@@ -19,8 +19,24 @@ function easyHundredPair(): [number, number] {
   return [tens[randomInt(0, tens.length - 1)], ones[randomInt(0, ones.length - 1)]];
 }
 
+function carryAdditionPair(): [number, number] {
+  const a = randomInt(6, 89);
+  const ones = a % 10;
+  const minB = Math.max(10 - ones, 1);
+  const b = randomInt(minB, 100 - a);
+  return [a, b];
+}
+
+function borrowSubtractionPair(): [number, number] {
+  const a = randomInt(11, 100);
+  const aOnes = a % 10;
+  const candidates = Array.from({ length: a }, (_, index) => index + 1).filter((value) => value % 10 > aOnes);
+  const b = candidates.length ? candidates[randomInt(0, candidates.length - 1)] : randomInt(0, a);
+  return [a, b];
+}
+
 function generateOne(level: MathLevel, includeSubtraction: boolean, index: number): MathQuestion {
-  const allowSubtraction = includeSubtraction || level === 'L2' || level === 'L4' || level === 'L6';
+  const allowSubtraction = includeSubtraction && ['L2', 'L4', 'L5', 'L6'].includes(level);
   const operator: '+' | '-' = allowSubtraction && Math.random() > 0.55 ? '-' : '+';
 
   if (level === 'L1') {
@@ -68,12 +84,10 @@ function generateOne(level: MathLevel, includeSubtraction: boolean, index: numbe
   }
 
   if (operator === '-') {
-    const a = randomInt(10, 100);
-    const b = randomInt(0, a);
+    const [a, b] = borrowSubtractionPair();
     return makeQuestion(index, a, b, '-');
   }
-  const a = randomInt(0, 99);
-  const b = randomInt(0, 100 - a);
+  const [a, b] = carryAdditionPair();
   return makeQuestion(index, a, b, '+');
 }
 

@@ -2,6 +2,7 @@ import type { TrainingSession, TrainingSettings } from '../types';
 
 const SETTINGS_KEY = 'cta-settings';
 const SESSIONS_KEY = 'cta-sessions';
+const DRAFT_SESSION_KEY = 'cta-draft-session';
 
 export const defaultSettings: TrainingSettings = {
   patientNickname: '家人',
@@ -49,4 +50,22 @@ export function updateSession(session: TrainingSession): void {
 
 export function findSession(id: string): TrainingSession | undefined {
   return loadSessions().find((session) => session.id === id);
+}
+
+export function loadDraftSession(): TrainingSession | undefined {
+  const raw = localStorage.getItem(DRAFT_SESSION_KEY);
+  if (!raw) return undefined;
+  try {
+    return JSON.parse(raw) as TrainingSession;
+  } catch {
+    return undefined;
+  }
+}
+
+export function saveDraftSession(session: TrainingSession): void {
+  localStorage.setItem(DRAFT_SESSION_KEY, JSON.stringify(session));
+}
+
+export function clearDraftSession(): void {
+  localStorage.removeItem(DRAFT_SESSION_KEY);
 }
