@@ -30,6 +30,11 @@ withDefaults(
   cursor: pointer;
 }
 
+.app-button:disabled {
+  cursor: default;
+  opacity: 0.68;
+}
+
 .block {
   width: 100%;
 }

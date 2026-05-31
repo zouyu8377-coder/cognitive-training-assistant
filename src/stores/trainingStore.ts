@@ -2,8 +2,11 @@ import { reactive } from 'vue';
 import type {
   MathQuestion,
   NumberConnectResult,
+  ObjectNamingQuestion,
+  OddOneOutQuestion,
   PatientMood,
   PreTrainingStatus,
+  ShapeCopyTask,
   TrainingSession,
   TrainingSettings,
 } from '../types';
@@ -19,6 +22,7 @@ import {
   updateSession,
 } from '../utils/storage';
 import { generateMathQuestions } from '../utils/mathGenerator';
+import { generateObjectNamingQuestions, generateOddOneOutQuestions, generateShapeCopyTask } from '../utils/visualTraining';
 
 interface TrainingState {
   settings: TrainingSettings;
@@ -35,6 +39,12 @@ function newId(): string {
 }
 
 export function useTrainingStore() {
+  function ensureVisualTasks(session: TrainingSession) {
+    if (!session.objectNamingQuestions?.length) session.objectNamingQuestions = generateObjectNamingQuestions();
+    if (!session.shapeCopyTask) session.shapeCopyTask = generateShapeCopyTask();
+    if (!session.oddOneOutQuestions?.length) session.oddOneOutQuestions = generateOddOneOutQuestions();
+  }
+
   function updateSettings(settings: TrainingSettings) {
     state.settings = { ...settings };
     saveSettings(state.settings);
@@ -53,12 +63,16 @@ export function useTrainingStore() {
       startedAt: new Date().toISOString(),
       preTrainingStatus,
       mathQuestions: questions,
+      objectNamingQuestions: generateObjectNamingQuestions(),
+      shapeCopyTask: generateShapeCopyTask(),
+      oddOneOutQuestions: generateOddOneOutQuestions(),
     };
     persistDraft();
   }
 
   function ensureSession() {
     if (!state.currentSession) startTodaySession();
+    ensureVisualTasks(state.currentSession as TrainingSession);
     return state.currentSession as TrainingSession;
   }
 
@@ -74,6 +88,25 @@ export function useTrainingStore() {
 
   function setNumberConnectResult(result: NumberConnectResult) {
     ensureSession().numberConnectResult = result;
+    persistDraft();
+  }
+
+  function setObjectNamingQuestion(index: number, question: ObjectNamingQuestion) {
+    const session = ensureSession();
+    if (!session.objectNamingQuestions) session.objectNamingQuestions = generateObjectNamingQuestions();
+    session.objectNamingQuestions[index] = question;
+    persistDraft();
+  }
+
+  function setShapeCopyTask(task: ShapeCopyTask) {
+    ensureSession().shapeCopyTask = task;
+    persistDraft();
+  }
+
+  function setOddOneOutQuestion(index: number, question: OddOneOutQuestion) {
+    const session = ensureSession();
+    if (!session.oddOneOutQuestions) session.oddOneOutQuestions = generateOddOneOutQuestions();
+    session.oddOneOutQuestions[index] = question;
     persistDraft();
   }
 
@@ -124,6 +157,9 @@ export function useTrainingStore() {
     ensureSession,
     setMathQuestion,
     setNumberConnectResult,
+    setObjectNamingQuestion,
+    setShapeCopyTask,
+    setOddOneOutQuestion,
     setWritingStatus,
     setSingingStatus,
     finishSession,

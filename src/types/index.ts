@@ -30,6 +30,41 @@ export interface NumberConnectResult {
   durationSeconds: number;
 }
 
+export interface ObjectNamingQuestion {
+  id: string;
+  name: string;
+  aliases: string[];
+  icon: string;
+  userAnswer?: string;
+  inputMethod?: 'text' | 'voice' | 'handwriting' | 'skipped';
+  isCorrect?: boolean;
+  skipped?: boolean;
+  timeSpentSeconds?: number;
+}
+
+export interface ShapeCopyTask {
+  id: string;
+  shapeName: string;
+  shapeKind: 'circle' | 'rectangle' | 'diamond' | 'triangle' | 'star';
+  completed?: boolean;
+  skipped?: boolean;
+  redrawCount: number;
+  durationSeconds?: number;
+}
+
+export interface OddOneOutQuestion {
+  id: string;
+  prompt: string;
+  itemLabel: string;
+  oddLabel: string;
+  grid: string[];
+  answerIndex: number;
+  selectedIndex?: number;
+  isCorrect?: boolean;
+  skipped?: boolean;
+  timeSpentSeconds?: number;
+}
+
 export interface TrainingSession {
   id: string;
   patientNickname: string;
@@ -39,6 +74,9 @@ export interface TrainingSession {
   preTrainingStatus?: PreTrainingStatus;
   mathQuestions: MathQuestion[];
   numberConnectResult?: NumberConnectResult;
+  objectNamingQuestions?: ObjectNamingQuestion[];
+  shapeCopyTask?: ShapeCopyTask;
+  oddOneOutQuestions?: OddOneOutQuestion[];
   writingStatus?: 'completed' | 'skipped' | 'help_needed';
   singingStatus?: 'completed_good' | 'completed_tired' | 'skipped' | 'not_done';
   patientMood?: PatientMood;

@@ -13,6 +13,9 @@
         <p>数字顺序：{{ session.numberConnectResult?.completed ? '已完成' : '未完成' }}</p>
         <p>重新尝试点击：{{ session.numberConnectResult?.wrongClicks ?? 0 }} 次</p>
         <p>数字顺序耗时：{{ formatDuration(session.numberConnectResult?.durationSeconds) }}</p>
+        <p>看图说名称：{{ objectCorrect }} / {{ objectTotal }}</p>
+        <p>照着画图形：{{ shapeCopyText }}</p>
+        <p>找不同：{{ oddCorrect }} / {{ oddTotal }}</p>
         <p>写名字：{{ writingText }}</p>
         <p>跟唱：{{ singingText }}</p>
         <p>本次总耗时：{{ formatDuration(totalDuration) }}</p>
@@ -30,6 +33,40 @@
             <strong>第 {{ index + 1 }} 题：{{ question.expression }} {{ question.correctAnswer }}</strong>
             <span>作答：{{ answerText(question) }}</span>
             <span>情况：{{ questionStatusText(question) }}</span>
+            <span>用时：{{ formatDuration(question.timeSpentSeconds) }}</span>
+          </div>
+        </div>
+      </ResultCard>
+
+      <ResultCard>
+        <h2>看图说名称记录</h2>
+        <div class="question-list">
+          <div v-for="(question, index) in session.objectNamingQuestions ?? []" :key="question.id" class="question-row">
+            <strong>第 {{ index + 1 }} 题：{{ question.name }}</strong>
+            <span>作答：{{ question.userAnswer || '暂未作答' }}</span>
+            <span>方式：{{ objectInputText(question.inputMethod) }}</span>
+            <span>情况：{{ objectiveStatusText(question.isCorrect, question.skipped) }}</span>
+            <span>用时：{{ formatDuration(question.timeSpentSeconds) }}</span>
+          </div>
+        </div>
+      </ResultCard>
+
+      <ResultCard>
+        <h2>图形临摹记录</h2>
+        <p>图形：{{ session.shapeCopyTask?.shapeName ?? '未记录' }}</p>
+        <p>状态：{{ shapeCopyText }}</p>
+        <p>重新绘制：{{ session.shapeCopyTask?.redrawCount ?? 0 }} 次</p>
+        <p>用时：{{ formatDuration(session.shapeCopyTask?.durationSeconds) }}</p>
+      </ResultCard>
+
+      <ResultCard>
+        <h2>找不同记录</h2>
+        <div class="question-list">
+          <div v-for="(question, index) in session.oddOneOutQuestions ?? []" :key="question.id" class="question-row">
+            <strong>第 {{ index + 1 }} 题：{{ question.prompt }}</strong>
+            <span>正确答案：第 {{ question.answerIndex + 1 }} 个（{{ question.oddLabel }}）</span>
+            <span>选择：{{ question.selectedIndex === undefined ? '暂未作答' : `第 ${question.selectedIndex + 1} 个（${question.grid[question.selectedIndex]}）` }}</span>
+            <span>情况：{{ objectiveStatusText(question.isCorrect, question.skipped) }}</span>
             <span>用时：{{ formatDuration(question.timeSpentSeconds) }}</span>
           </div>
         </div>
@@ -79,7 +116,7 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
-import type { MathQuestion, PatientMood, TrainingSession } from '../types';
+import type { MathQuestion, ObjectNamingQuestion, PatientMood, TrainingSession } from '../types';
 import { formatDuration } from '../utils/date';
 import { buildNextTrainingSuggestions, patientMoodText, preTrainingStatusText } from '../utils/sessionInsights';
 import { findSession } from '../utils/storage';
@@ -100,9 +137,19 @@ const skippedMath = computed(() => session.value?.mathQuestions.filter((q) => q.
 const mathDuration = computed(() =>
   session.value?.mathQuestions.reduce((sum, q) => sum + (q.timeSpentSeconds ?? 0), 0) ?? 0,
 );
+const objectTotal = computed(() => session.value?.objectNamingQuestions?.length ?? 0);
+const objectCorrect = computed(() => session.value?.objectNamingQuestions?.filter((q) => q.isCorrect).length ?? 0);
+const oddTotal = computed(() => session.value?.oddOneOutQuestions?.length ?? 0);
+const oddCorrect = computed(() => session.value?.oddOneOutQuestions?.filter((q) => q.isCorrect).length ?? 0);
+const visualDuration = computed(() => {
+  const objects = session.value?.objectNamingQuestions?.reduce((sum, q) => sum + (q.timeSpentSeconds ?? 0), 0) ?? 0;
+  const shape = session.value?.shapeCopyTask?.durationSeconds ?? 0;
+  const odd = session.value?.oddOneOutQuestions?.reduce((sum, q) => sum + (q.timeSpentSeconds ?? 0), 0) ?? 0;
+  return objects + shape + odd;
+});
 const totalDuration = computed(() => {
   if (!session.value?.completedAt) {
-    return mathDuration.value + (session.value?.numberConnectResult?.durationSeconds ?? 0);
+    return mathDuration.value + (session.value?.numberConnectResult?.durationSeconds ?? 0) + visualDuration.value;
   }
   return Math.max(
     1,
@@ -113,6 +160,11 @@ const preStatusText = computed(() =>
   session.value?.preTrainingStatus ? preTrainingStatusText[session.value.preTrainingStatus] : '未记录',
 );
 const moodText = computed(() => (session.value?.patientMood ? patientMoodText[session.value.patientMood] : '未记录'));
+const shapeCopyText = computed(() => {
+  if (session.value?.shapeCopyTask?.completed) return '已完成';
+  if (session.value?.shapeCopyTask?.skipped) return '今天先不画';
+  return '未记录';
+});
 const suggestions = computed(() =>
   session.value ? buildNextTrainingSuggestions({ ...session.value, patientMood: mood.value }) : [],
 );
@@ -149,6 +201,23 @@ function questionStatusText(question: MathQuestion): string {
   if (question.isCorrect) return '正确';
   if (question.userAnswer === undefined) return '未记录';
   return '需家属查看';
+}
+
+function objectiveStatusText(isCorrect?: boolean, skipped?: boolean): string {
+  if (skipped) return '暂未作答';
+  if (isCorrect) return '正确';
+  if (isCorrect === false) return '需家属查看';
+  return '未记录';
+}
+
+function objectInputText(method?: ObjectNamingQuestion['inputMethod']): string {
+  const map: Record<NonNullable<ObjectNamingQuestion['inputMethod']>, string> = {
+    text: '文字输入',
+    voice: '语音输入',
+    handwriting: '手写辅助',
+    skipped: '暂未作答',
+  };
+  return method ? map[method] : '未记录';
 }
 </script>
 

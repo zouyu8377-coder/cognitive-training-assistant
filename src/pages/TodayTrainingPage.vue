@@ -7,6 +7,9 @@
         <ul>
           <li>数学练习：{{ store.state.settings.mathQuestionCount }} 题</li>
           <li>数字顺序练习：1-{{ store.state.settings.numberConnectLevel }}</li>
+          <li>看图说名称：3 题</li>
+          <li>照着画图形：1 题</li>
+          <li>找不同：3 题</li>
           <li v-if="store.state.settings.includeWritingTask">写名字</li>
           <li v-if="store.state.settings.includeSingingTask">跟唱记录</li>
         </ul>

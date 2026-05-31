@@ -7,8 +7,8 @@
       <LargeNumberPad @press="append" @clear="answer = ''" @backspace="backspace" />
       <p class="soft">{{ message }}</p>
       <div class="actions">
-        <AppButton tone="quiet" @click="skip">跳过</AppButton>
-        <AppButton @click="next">下一题</AppButton>
+        <AppButton tone="quiet" :disabled="waiting" @click="skip">跳过</AppButton>
+        <AppButton :disabled="waiting" @click="next">下一题</AppButton>
       </div>
     </section>
   </PageContainer>
@@ -32,6 +32,7 @@ const currentIndex = ref(firstPendingMathIndex(session));
 const answer = ref('');
 const startedAt = ref(Date.now());
 const message = ref('输入答案后点下一题。');
+const waiting = ref(false);
 const current = computed(() => questions[currentIndex.value]);
 
 function append(value: number) {
@@ -44,13 +45,15 @@ function backspace() {
 
 function record(skipped: boolean) {
   const userAnswer = answer.value ? Number(answer.value) : undefined;
+  const isCorrect = skipped ? false : userAnswer === current.value.correctAnswer;
   store.setMathQuestion(currentIndex.value, {
     ...current.value,
     userAnswer,
     skipped,
-    isCorrect: skipped ? false : userAnswer === current.value.correctAnswer,
+    isCorrect,
     timeSpentSeconds: Math.max(1, Math.round((Date.now() - startedAt.value) / 1000)),
   });
+  return isCorrect;
 }
 
 function moveOn() {
@@ -69,8 +72,13 @@ function next() {
     message.value = '可以输入答案，也可以先跳过。';
     return;
   }
-  record(false);
-  moveOn();
+  const isCorrect = record(false);
+  waiting.value = true;
+  message.value = isCorrect ? '答对啦，很好。' : '已经认真尝试了，继续保持。';
+  window.setTimeout(() => {
+    waiting.value = false;
+    moveOn();
+  }, 650);
 }
 
 function skip() {
