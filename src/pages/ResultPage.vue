@@ -23,6 +23,18 @@
         <p v-for="item in suggestions" :key="item">{{ item }}</p>
       </ResultCard>
 
+      <ResultCard>
+        <h2>数学逐题记录</h2>
+        <div class="question-list">
+          <div v-for="(question, index) in session.mathQuestions" :key="question.id" class="question-row">
+            <strong>第 {{ index + 1 }} 题：{{ question.expression }} {{ question.correctAnswer }}</strong>
+            <span>作答：{{ answerText(question) }}</span>
+            <span>情况：{{ questionStatusText(question) }}</span>
+            <span>用时：{{ formatDuration(question.timeSpentSeconds) }}</span>
+          </div>
+        </div>
+      </ResultCard>
+
       <ResultCard v-if="isHistoryDetail && !isEditing">
         <h2>家属记录</h2>
         <p>患者状态：{{ moodText }}</p>
@@ -67,7 +79,7 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
-import type { PatientMood, TrainingSession } from '../types';
+import type { MathQuestion, PatientMood, TrainingSession } from '../types';
 import { formatDuration } from '../utils/date';
 import { buildNextTrainingSuggestions, patientMoodText, preTrainingStatusText } from '../utils/sessionInsights';
 import { findSession } from '../utils/storage';
@@ -126,6 +138,18 @@ function save() {
   }
   router.push('/history');
 }
+
+function answerText(question: MathQuestion): string {
+  if (question.skipped) return '暂未作答';
+  return question.userAnswer === undefined ? '未记录' : String(question.userAnswer);
+}
+
+function questionStatusText(question: MathQuestion): string {
+  if (question.skipped) return '暂未作答';
+  if (question.isCorrect) return '正确';
+  if (question.userAnswer === undefined) return '未记录';
+  return '需家属查看';
+}
 </script>
 
 <style scoped>
@@ -149,5 +173,23 @@ textarea {
   border-radius: 8px;
   padding: 12px;
   background: #ffffff;
+}
+
+.question-list {
+  display: grid;
+  gap: 12px;
+}
+
+.question-row {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #d8e1db;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.question-row span {
+  color: #52615d;
 }
 </style>

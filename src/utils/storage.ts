@@ -32,7 +32,7 @@ export function loadSessions(): TrainingSession[] {
   const raw = localStorage.getItem(SESSIONS_KEY);
   if (!raw) return [];
   try {
-    return JSON.parse(raw) as TrainingSession[];
+    return normalizeDailySessions(JSON.parse(raw) as TrainingSession[]);
   } catch {
     return [];
   }
@@ -40,7 +40,10 @@ export function loadSessions(): TrainingSession[] {
 
 export function saveSession(session: TrainingSession): void {
   const sessions = loadSessions();
-  const next = [session, ...sessions.filter((item) => item.id !== session.id)];
+  const next = normalizeDailySessions([
+    session,
+    ...sessions.filter((item) => item.id !== session.id && item.date !== session.date),
+  ]);
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(next));
 }
 
@@ -68,4 +71,16 @@ export function saveDraftSession(session: TrainingSession): void {
 
 export function clearDraftSession(): void {
   localStorage.removeItem(DRAFT_SESSION_KEY);
+}
+
+function sessionTime(session: TrainingSession): number {
+  return new Date(session.completedAt ?? session.startedAt).getTime();
+}
+
+function normalizeDailySessions(sessions: TrainingSession[]): TrainingSession[] {
+  const byDate = new Map<string, TrainingSession>();
+  for (const session of [...sessions].sort((a, b) => sessionTime(b) - sessionTime(a))) {
+    if (!byDate.has(session.date)) byDate.set(session.date, session);
+  }
+  return [...byDate.values()].sort((a, b) => sessionTime(b) - sessionTime(a));
 }
