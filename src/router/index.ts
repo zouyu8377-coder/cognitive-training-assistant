@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import HomePage from '../pages/HomePage.vue';
 import SetupPage from '../pages/SetupPage.vue';
 import TodayTrainingPage from '../pages/TodayTrainingPage.vue';
@@ -14,7 +14,7 @@ import ResultPage from '../pages/ResultPage.vue';
 import HistoryPage from '../pages/HistoryPage.vue';
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: [
     { path: '/', component: HomePage },
     { path: '/setup', component: SetupPage },

@@ -13,6 +13,16 @@ npm install
 npm run dev
 ```
 
+## 公开部署
+
+本项目已配置 GitHub Pages 自动部署。推送到公开 GitHub 仓库的 `main` 分支后，可在仓库 Settings → Pages 中选择 GitHub Actions 作为发布来源。
+
+默认访问路径适配仓库名：
+
+```text
+https://<github-user>.github.io/cognitive-training-assistant/
+```
+
 ## 当前 MVP 功能
 
 - 照护者设置训练难度和任务开关。
