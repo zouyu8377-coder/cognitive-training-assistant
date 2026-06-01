@@ -16,9 +16,10 @@
         <p class="muted">已经尝试 {{ attempts.length }} 次。{{ bestSavedMessage }}</p>
       </ResultCard>
 
-      <AppButton tone="quiet" block @click="clearCanvas">清空重画</AppButton>
-      <AppButton block @click="completeAttempt">完成并查看结果</AppButton>
-      <AppButton v-if="latestAttempt" tone="secondary" block @click="drawAgain">再画一次</AppButton>
+      <div class="primary-actions">
+        <AppButton tone="quiet" block @click="clearCanvas">清空重画</AppButton>
+        <AppButton block @click="completeAttempt">完成</AppButton>
+      </div>
       <AppButton v-if="latestAttempt" block @click="saveAndContinue">保存并继续</AppButton>
       <AppButton tone="secondary" block @click="skip">今天先不画</AppButton>
     </section>
@@ -95,12 +96,6 @@ function completeAttempt() {
   message.value = metrics.feedbackText;
 }
 
-function drawAgain() {
-  canvas.value?.clear();
-  latestAttempt.value = undefined;
-  message.value = '没关系，我们再试一次。可以慢慢画，不着急。';
-}
-
 function saveAndContinue() {
   persistDraft(bestAttempt.value?.id, true, false);
   message.value = '已保存本次练习。';
@@ -131,5 +126,11 @@ h2 {
 
 .hint {
   color: #52615d;
+}
+
+.primary-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 </style>
