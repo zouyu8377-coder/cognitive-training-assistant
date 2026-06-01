@@ -1,10 +1,11 @@
 <template>
   <svg class="line-art" viewBox="0 0 160 130" role="img" :aria-label="label">
-    <g v-if="kind === 'zebra'" fill="none" stroke="#26312f" stroke-width="5" stroke-linecap="round">
-      <ellipse cx="78" cy="72" rx="48" ry="28" />
-      <circle cx="122" cy="58" r="17" />
-      <path d="M34 82v30M58 94v24M96 94v24M116 82v30M120 40l8-18M132 43l13-11" />
-      <path d="M52 48l-10 42M72 44l-12 52M92 46L78 96M112 52L98 90" />
+    <g v-if="kind === 'zebra'" fill="none" stroke="#26312f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M29 73c6-25 35-39 70-31 15 4 25 11 31 22 8 16-1 34-22 42-29 12-69 6-82-15-4-6-4-12 3-18z" />
+      <path d="M123 55c11-13 28-7 30 7 3 14-8 25-21 21M136 51l3-17M147 55l11-10" />
+      <path d="M34 93v29M56 104v23M91 107v20M113 99v28" />
+      <path d="M45 50l-11 43M62 43L48 99M82 41L66 106M101 46L84 110M118 59l-15 44" />
+      <path d="M28 72c-12-9-14-23-4-31M28 70l-16-4" />
     </g>
     <g v-else-if="kind === 'ruler'" fill="none" stroke="#26312f" stroke-width="5" stroke-linecap="round">
       <rect x="22" y="44" width="116" height="42" rx="5" />

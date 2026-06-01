@@ -21,7 +21,6 @@
       <RouterLink v-if="selectedSession" :to="`/result/${selectedSession.id}`">
         <AppButton block>查看当天结果</AppButton>
       </RouterLink>
-      <RouterLink to="/weekly-summary"><AppButton tone="secondary" block>查看最近 7 天复盘</AppButton></RouterLink>
 
       <ResultCard v-for="item in recentSessions" :key="item.id">
         <RouterLink class="record" :to="`/result/${item.id}`">

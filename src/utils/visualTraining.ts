@@ -19,11 +19,27 @@ const shapes: Array<Pick<ShapeCopyTask, 'shapeName' | 'shapeKind'>> = [
 
 const oddBank = [
   { prompt: '找出不一样的数字', itemLabel: '15', oddLabel: '12' },
+  { prompt: '找出不一样的数字', itemLabel: '68', oddLabel: '86' },
+  { prompt: '找出不一样的数字', itemLabel: '36', oddLabel: '38' },
+  { prompt: '找出不一样的数字', itemLabel: '909', oddLabel: '606' },
   { prompt: '找出不一样的字母', itemLabel: 'T', oddLabel: '⊥' },
+  { prompt: '找出不一样的字母', itemLabel: 'E', oddLabel: 'F' },
+  { prompt: '找出不一样的字母', itemLabel: 'b', oddLabel: 'd' },
+  { prompt: '找出不一样的字母', itemLabel: 'p', oddLabel: 'q' },
   { prompt: '找出不一样的汉字', itemLabel: '千', oddLabel: '干' },
+  { prompt: '找出不一样的汉字', itemLabel: '日', oddLabel: '目' },
+  { prompt: '找出不一样的汉字', itemLabel: '土', oddLabel: '士' },
+  { prompt: '找出不一样的汉字', itemLabel: '未', oddLabel: '末' },
   { prompt: '找出不一样的数字', itemLabel: '180', oddLabel: 'IBO' },
   { prompt: '找出不一样的图形', itemLabel: '○', oddLabel: '◇' },
+  { prompt: '找出不一样的图形', itemLabel: '□', oddLabel: '△' },
+  { prompt: '找出不一样的图形', itemLabel: '＋', oddLabel: '×' },
+  { prompt: '找出不一样的图形', itemLabel: '●', oddLabel: '○' },
   { prompt: '找出不一样的方向', itemLabel: '↑', oddLabel: '↓' },
+  { prompt: '找出不一样的方向', itemLabel: '←', oddLabel: '→' },
+  { prompt: '找出不一样的方向', itemLabel: '↗', oddLabel: '↘' },
+  { prompt: '找出不一样的符号', itemLabel: '✓', oddLabel: '∨' },
+  { prompt: '找出不一样的符号', itemLabel: '＝', oddLabel: '≠' },
 ];
 
 function randomId(prefix: string, index: number): string {

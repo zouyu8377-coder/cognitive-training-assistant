@@ -12,7 +12,6 @@ import SingingTaskPage from '../pages/SingingTaskPage.vue';
 import CompletePage from '../pages/CompletePage.vue';
 import ResultPage from '../pages/ResultPage.vue';
 import HistoryPage from '../pages/HistoryPage.vue';
-import WeeklySummaryPage from '../pages/WeeklySummaryPage.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -30,7 +29,6 @@ const router = createRouter({
     { path: '/complete', component: CompletePage },
     { path: '/result/:id?', component: ResultPage },
     { path: '/history', component: HistoryPage },
-    { path: '/weekly-summary', component: WeeklySummaryPage },
   ],
 });
 
