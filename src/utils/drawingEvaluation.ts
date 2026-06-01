@@ -126,7 +126,7 @@ export function getDrawingFeedback(level: DrawingLevel, audience: 'patient' | 'c
     excellent: '画得很完整，今天完成得很好！',
     good: '完成得不错，主要形状已经画出来啦！',
     completed: '已经完成啦，愿意练习就很棒。',
-    try_again: '已经尝试完成啦，如果愿意，可以再画一次。',
+    try_again: '已经尝试完成啦，可以休息一下。',
   };
   return patient[level];
 }

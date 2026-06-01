@@ -1,6 +1,6 @@
 <template>
   <PageContainer>
-    <ProgressHeader title="数字顺序练习" label="按 1、2、3 的顺序点" />
+    <ProgressHeader title="数字顺序练习" :label="orderLabel" />
     <section class="stack">
       <div class="board">
         <button
@@ -28,16 +28,21 @@ import AppButton from '../components/AppButton.vue';
 import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import { useTrainingStore } from '../stores/trainingStore';
-import type { NumberDot } from '../types';
+import type { NumberConnectOrder, NumberDot } from '../types';
 import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
+const session = store.ensureSession();
 const level = store.state.settings.numberConnectLevel;
-const nextValue = ref(1);
+const order: NumberConnectOrder = session.numberConnectOrder ?? (Math.random() > 0.5 ? 'ascending' : 'descending');
+store.setNumberConnectOrder(order);
+const orderLabel = order === 'ascending' ? '从小到大点' : '从大到小点';
+const initialValue = order === 'ascending' ? 1 : level;
+const nextValue = ref(initialValue);
 const wrongClicks = ref(0);
 const startedAt = Date.now();
-const hint = ref('请先点击 1。');
+const hint = ref(`请先点击 ${initialValue}。`);
 
 function shuffledPositions(count: number) {
   const columns = count <= 5 ? 2 : count <= 10 ? 3 : 4;
@@ -64,9 +69,9 @@ const dots = ref<NumberDot[]>(
 );
 
 function finish(completed: boolean) {
-  const session = store.ensureSession();
   store.setNumberConnectResult({
     level,
+    order,
     completed,
     wrongClicks: wrongClicks.value,
     durationSeconds: Math.max(1, Math.round((Date.now() - startedAt) / 1000)),
@@ -82,9 +87,10 @@ function tap(value: number) {
   }
   const dot = dots.value.find((item) => item.value === value);
   if (dot) dot.completed = true;
-  nextValue.value += 1;
-  hint.value = nextValue.value > level ? '完成啦。' : `很好，接着点 ${nextValue.value}。`;
-  if (nextValue.value > level) finish(true);
+  nextValue.value = order === 'ascending' ? nextValue.value + 1 : nextValue.value - 1;
+  const done = order === 'ascending' ? nextValue.value > level : nextValue.value < 1;
+  hint.value = done ? '完成啦。' : `很好，接着点 ${nextValue.value}。`;
+  if (done) finish(true);
 }
 </script>
 

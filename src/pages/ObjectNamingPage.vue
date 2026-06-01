@@ -7,11 +7,12 @@
       </ResultCard>
       <DrawingCanvas ref="canvas" @redraw="hasDrawing = true" />
       <p class="hint">{{ message }}</p>
-      <div class="actions">
-        <AppButton tone="quiet" :disabled="waiting" @click="skip">先跳过</AppButton>
-        <AppButton tone="secondary" :disabled="waiting" @click="startVoice">语音输入</AppButton>
+      <div class="primary-actions">
+        <AppButton tone="quiet" :disabled="waiting" @click="rewrite">重写</AppButton>
         <AppButton :disabled="waiting" @click="submitHandwriting">手写完成</AppButton>
       </div>
+      <AppButton tone="secondary" :disabled="waiting" block @click="startVoice">语音输入</AppButton>
+      <AppButton tone="quiet" :disabled="waiting" block @click="skip">先跳过</AppButton>
     </section>
   </PageContainer>
 </template>
@@ -99,6 +100,12 @@ function submitHandwriting() {
   }, 650);
 }
 
+function rewrite() {
+  canvas.value?.clear();
+  hasDrawing.value = false;
+  message.value = '可以重新写。';
+}
+
 function skip() {
   recordHandwriting(true);
   message.value = '先放一放也可以。';
@@ -141,9 +148,9 @@ function startVoice() {
   color: #52615d;
 }
 
-.actions {
+.primary-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 </style>

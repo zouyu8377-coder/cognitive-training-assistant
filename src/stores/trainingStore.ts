@@ -1,6 +1,7 @@
 import { reactive } from 'vue';
 import type {
   MathQuestion,
+  NumberConnectOrder,
   NumberConnectResult,
   ObjectNamingQuestion,
   OddOneOutQuestion,
@@ -63,6 +64,7 @@ export function useTrainingStore() {
       startedAt: new Date().toISOString(),
       preTrainingStatus,
       mathQuestions: questions,
+      numberConnectOrder: Math.random() > 0.5 ? 'ascending' : 'descending',
       objectNamingQuestions: generateObjectNamingQuestions(),
       shapeCopyTask: generateShapeCopyTask(),
       oddOneOutQuestions: generateOddOneOutQuestions(),
@@ -88,6 +90,11 @@ export function useTrainingStore() {
 
   function setNumberConnectResult(result: NumberConnectResult) {
     ensureSession().numberConnectResult = result;
+    persistDraft();
+  }
+
+  function setNumberConnectOrder(order: NumberConnectOrder) {
+    ensureSession().numberConnectOrder = order;
     persistDraft();
   }
 
@@ -126,6 +133,15 @@ export function useTrainingStore() {
     persistDraft();
   }
 
+  function finishAndSaveSession() {
+    if (!state.currentSession) return;
+    const session = state.currentSession;
+    session.completedAt = session.completedAt ?? new Date().toISOString();
+    saveSession(JSON.parse(JSON.stringify(session)) as TrainingSession);
+    clearDraftSession();
+    state.currentSession = undefined;
+  }
+
   function saveCaregiverResult(patientMood: PatientMood, caregiverNote: string) {
     const session = ensureSession();
     session.patientMood = patientMood;
@@ -157,12 +173,14 @@ export function useTrainingStore() {
     ensureSession,
     setMathQuestion,
     setNumberConnectResult,
+    setNumberConnectOrder,
     setObjectNamingQuestion,
     setShapeCopyTask,
     setOddOneOutQuestion,
     setWritingStatus,
     setSingingStatus,
     finishSession,
+    finishAndSaveSession,
     saveCaregiverResult,
     saveExistingResult,
     discardCurrentSession,

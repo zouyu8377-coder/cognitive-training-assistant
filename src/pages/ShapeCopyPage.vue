@@ -77,7 +77,7 @@ function clearCanvas() {
 function completeAttempt() {
   const points = canvas.value?.getPoints() ?? [];
   if (points.length < 6) {
-    message.value = '可以先画几笔，再查看结果。';
+    message.value = '可以先画几笔，再点完成。';
     return;
   }
   const metrics = evaluateShapeDrawing(task.shapeKind, points);

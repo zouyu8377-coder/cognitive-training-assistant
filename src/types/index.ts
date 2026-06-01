@@ -4,6 +4,7 @@ export type PatientMood = 'calm' | 'happy' | 'tired' | 'resistant' | 'need_lower
 export type PreTrainingStatus = 'steady' | 'tired' | 'low_mood' | 'not_willing';
 export type ShapeType = 'circle' | 'rectangle' | 'triangle';
 export type DrawingLevel = 'excellent' | 'good' | 'completed' | 'try_again';
+export type NumberConnectOrder = 'ascending' | 'descending';
 
 export interface TrainingSettings {
   patientNickname: string;
@@ -27,6 +28,7 @@ export interface MathQuestion {
 
 export interface NumberConnectResult {
   level: NumberConnectLevel;
+  order?: NumberConnectOrder;
   completed: boolean;
   wrongClicks: number;
   durationSeconds: number;
@@ -113,6 +115,7 @@ export interface TrainingSession {
   completedAt?: string;
   preTrainingStatus?: PreTrainingStatus;
   mathQuestions: MathQuestion[];
+  numberConnectOrder?: NumberConnectOrder;
   numberConnectResult?: NumberConnectResult;
   objectNamingQuestions?: ObjectNamingQuestion[];
   shapeCopyTask?: ShapeCopyTask;

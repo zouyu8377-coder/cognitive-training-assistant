@@ -5,7 +5,6 @@
       <h1>今天的练习完成啦，辛苦了！</h1>
       <p>今日训练已完成，可以休息一下。</p>
       <RouterLink to="/"><AppButton tone="secondary" block>返回首页</AppButton></RouterLink>
-      <RouterLink to="/result"><AppButton block>查看结果</AppButton></RouterLink>
     </section>
   </PageContainer>
 </template>
@@ -19,7 +18,7 @@ import { useTrainingStore } from '../stores/trainingStore';
 const store = useTrainingStore();
 
 onMounted(() => {
-  store.finishSession();
+  store.finishAndSaveSession();
 });
 </script>
 
