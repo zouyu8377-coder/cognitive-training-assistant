@@ -63,7 +63,11 @@ function clear(shouldEmit = true) {
   if (shouldEmit) emit('redraw');
 }
 
-defineExpose({ clear });
+function snapshot(): string | undefined {
+  return canvas.value?.toDataURL('image/png');
+}
+
+defineExpose({ clear, snapshot });
 
 onMounted(() => {
   clear(false);

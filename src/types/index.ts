@@ -36,7 +36,8 @@ export interface ObjectNamingQuestion {
   aliases: string[];
   icon: string;
   userAnswer?: string;
-  inputMethod?: 'text' | 'voice' | 'handwriting' | 'skipped';
+  inputMethod?: 'voice' | 'handwriting' | 'skipped';
+  drawingDataUrl?: string;
   isCorrect?: boolean;
   skipped?: boolean;
   timeSpentSeconds?: number;
@@ -49,6 +50,7 @@ export interface ShapeCopyTask {
   completed?: boolean;
   skipped?: boolean;
   redrawCount: number;
+  drawingDataUrl?: string;
   durationSeconds?: number;
 }
 

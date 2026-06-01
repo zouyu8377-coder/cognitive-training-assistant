@@ -47,6 +47,7 @@ function finish(completed: boolean) {
     completed,
     skipped: !completed,
     redrawCount: redrawCount.value,
+    drawingDataUrl: completed ? canvas.value?.snapshot() : undefined,
     durationSeconds: Math.max(1, Math.round((Date.now() - startedAt) / 1000)),
   });
   message.value = completed ? '画得很好，完成啦。' : '今天先放一放也可以。';

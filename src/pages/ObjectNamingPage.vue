@@ -5,16 +5,12 @@
       <ResultCard>
         <LineArt :kind="current.icon" :label="current.name" />
       </ResultCard>
-      <label>
-        请输入或说出这个事物的名称
-        <input v-model="answer" placeholder="例如：桌子" />
-      </label>
-      <DrawingCanvas ref="canvas" @redraw="inputMethod = 'handwriting'" />
+      <DrawingCanvas ref="canvas" @redraw="hasDrawing = true" />
       <p class="hint">{{ message }}</p>
       <div class="actions">
-        <AppButton tone="quiet" @click="skip">先跳过</AppButton>
-        <AppButton tone="secondary" @click="startVoice">语音输入</AppButton>
-        <AppButton :disabled="waiting" @click="submit">确认</AppButton>
+        <AppButton tone="quiet" :disabled="waiting" @click="skip">先跳过</AppButton>
+        <AppButton tone="secondary" :disabled="waiting" @click="startVoice">语音输入</AppButton>
+        <AppButton :disabled="waiting" @click="submitHandwriting">手写完成</AppButton>
       </div>
     </section>
   </PageContainer>
@@ -30,8 +26,8 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
-import { isObjectAnswerCorrect } from '../utils/visualTraining';
 import { firstPendingObjectIndex, nextTaskRoute } from '../utils/trainingFlow';
+import { isObjectAnswerCorrect } from '../utils/visualTraining';
 
 type SpeechRecognitionConstructor = new () => {
   lang: string;
@@ -46,20 +42,33 @@ const store = useTrainingStore();
 const session = store.ensureSession();
 const questions = session.objectNamingQuestions ?? [];
 const currentIndex = ref(firstPendingObjectIndex(session));
-const answer = ref('');
-const inputMethod = ref<'text' | 'voice' | 'handwriting'>('text');
-const message = ref('可以写字、打字，也可以点语音输入。');
+const canvas = ref<InstanceType<typeof DrawingCanvas>>();
+const hasDrawing = ref(false);
+const message = ref('可以在空白区手写名称，也可以点语音输入。');
 const waiting = ref(false);
 const startedAt = ref(Date.now());
 const current = computed(() => questions[currentIndex.value]);
 
-function record(skipped: boolean) {
+function recordHandwriting(skipped: boolean) {
   store.setObjectNamingQuestion(currentIndex.value, {
     ...current.value,
-    userAnswer: skipped ? undefined : answer.value.trim(),
-    inputMethod: skipped ? 'skipped' : inputMethod.value,
-    isCorrect: skipped ? false : isObjectAnswerCorrect(current.value, answer.value),
+    userAnswer: undefined,
+    inputMethod: skipped ? 'skipped' : 'handwriting',
+    drawingDataUrl: skipped ? undefined : canvas.value?.snapshot(),
+    isCorrect: undefined,
     skipped,
+    timeSpentSeconds: Math.max(1, Math.round((Date.now() - startedAt.value) / 1000)),
+  });
+}
+
+function recordVoice(answer: string) {
+  store.setObjectNamingQuestion(currentIndex.value, {
+    ...current.value,
+    userAnswer: answer,
+    inputMethod: 'voice',
+    drawingDataUrl: hasDrawing.value ? canvas.value?.snapshot() : undefined,
+    isCorrect: isObjectAnswerCorrect(current.value, answer),
+    skipped: false,
     timeSpentSeconds: Math.max(1, Math.round((Date.now() - startedAt.value) / 1000)),
   });
 }
@@ -70,20 +79,20 @@ function moveOn() {
     return;
   }
   currentIndex.value += 1;
-  answer.value = '';
-  inputMethod.value = 'text';
+  hasDrawing.value = false;
+  canvas.value?.clear(false);
   message.value = '继续下一张图。';
   startedAt.value = Date.now();
 }
 
-function submit() {
-  if (!answer.value.trim()) {
-    message.value = '可以先输入名称，也可以先跳过。';
+function submitHandwriting() {
+  if (!hasDrawing.value) {
+    message.value = '可以先在空白区写一写，也可以先跳过。';
     return;
   }
-  record(false);
+  recordHandwriting(false);
   waiting.value = true;
-  message.value = isObjectAnswerCorrect(current.value, answer.value) ? '很好，认出来啦。' : '已经认真尝试了，继续下一题。';
+  message.value = '写好啦，家属稍后可以查看。';
   window.setTimeout(() => {
     waiting.value = false;
     moveOn();
@@ -91,7 +100,7 @@ function submit() {
 }
 
 function skip() {
-  record(true);
+  recordHandwriting(true);
   message.value = '先放一放也可以。';
   moveOn();
 }
@@ -103,39 +112,30 @@ function startVoice() {
     (window as unknown as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor })
       .webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    message.value = '当前浏览器不支持语音输入，可以打字或手写。';
+    message.value = '当前浏览器不支持语音输入，可以使用手写完成。';
     return;
   }
   const recognition = new SpeechRecognition();
   recognition.lang = 'zh-CN';
   recognition.interimResults = false;
   recognition.onresult = (event) => {
-    answer.value = event.results[0][0].transcript;
-    inputMethod.value = 'voice';
-    message.value = '已经听到啦，可以确认。';
+    const answer = event.results[0][0].transcript;
+    recordVoice(answer);
+    waiting.value = true;
+    message.value = isObjectAnswerCorrect(current.value, answer) ? '很好，认出来啦。' : '已经认真尝试了，继续下一题。';
+    window.setTimeout(() => {
+      waiting.value = false;
+      moveOn();
+    }, 650);
   };
   recognition.onerror = () => {
-    message.value = '这次没有听清，可以再试一次。';
+    message.value = '这次没有听清，可以再试一次，或使用手写完成。';
   };
   recognition.start();
 }
 </script>
 
 <style scoped>
-label {
-  display: grid;
-  gap: 8px;
-  font-weight: 800;
-}
-
-input {
-  min-height: 56px;
-  border: 1px solid #c9d6cf;
-  border-radius: 8px;
-  padding: 12px;
-  background: #ffffff;
-}
-
 .hint {
   min-height: 28px;
   color: #52615d;

@@ -47,6 +47,7 @@
             <span>方式：{{ objectInputText(question.inputMethod) }}</span>
             <span>情况：{{ objectiveStatusText(question.isCorrect, question.skipped) }}</span>
             <span>用时：{{ formatDuration(question.timeSpentSeconds) }}</span>
+            <img v-if="question.drawingDataUrl" class="drawing-preview" :src="question.drawingDataUrl" alt="手写记录" />
           </div>
         </div>
       </ResultCard>
@@ -57,6 +58,12 @@
         <p>状态：{{ shapeCopyText }}</p>
         <p>重新绘制：{{ session.shapeCopyTask?.redrawCount ?? 0 }} 次</p>
         <p>用时：{{ formatDuration(session.shapeCopyTask?.durationSeconds) }}</p>
+        <img
+          v-if="session.shapeCopyTask?.drawingDataUrl"
+          class="drawing-preview"
+          :src="session.shapeCopyTask.drawingDataUrl"
+          alt="图形临摹记录"
+        />
       </ResultCard>
 
       <ResultCard>
@@ -212,7 +219,6 @@ function objectiveStatusText(isCorrect?: boolean, skipped?: boolean): string {
 
 function objectInputText(method?: ObjectNamingQuestion['inputMethod']): string {
   const map: Record<NonNullable<ObjectNamingQuestion['inputMethod']>, string> = {
-    text: '文字输入',
     voice: '语音输入',
     handwriting: '手写辅助',
     skipped: '暂未作答',
@@ -260,5 +266,14 @@ textarea {
 
 .question-row span {
   color: #52615d;
+}
+
+.drawing-preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border: 1px solid #d8e1db;
+  border-radius: 8px;
+  background: #ffffff;
 }
 </style>
