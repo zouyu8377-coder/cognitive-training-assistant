@@ -36,7 +36,7 @@ function borrowSubtractionPair(): [number, number] {
 }
 
 function generateOne(level: MathLevel, includeSubtraction: boolean, index: number): MathQuestion {
-  const allowSubtraction = includeSubtraction && ['L2', 'L4', 'L5', 'L6'].includes(level);
+  const allowSubtraction = ['L2', 'L4', 'L5', 'L6'].includes(level);
   const operator: '+' | '-' = allowSubtraction && Math.random() > 0.55 ? '-' : '+';
 
   if (level === 'L1') {

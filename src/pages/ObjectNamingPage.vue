@@ -11,7 +11,6 @@
         <AppButton tone="quiet" :disabled="waiting" @click="rewrite">重写</AppButton>
         <AppButton :disabled="waiting" @click="submitHandwriting">手写完成</AppButton>
       </div>
-      <AppButton tone="secondary" :disabled="waiting" block @click="startVoice">语音输入</AppButton>
       <AppButton tone="quiet" :disabled="waiting" block @click="skip">先跳过</AppButton>
     </section>
   </PageContainer>
@@ -28,15 +27,6 @@ import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
 import { firstPendingObjectIndex, nextTaskRoute } from '../utils/trainingFlow';
-import { isObjectAnswerCorrect } from '../utils/visualTraining';
-
-type SpeechRecognitionConstructor = new () => {
-  lang: string;
-  interimResults: boolean;
-  start: () => void;
-  onresult: ((event: { results: ArrayLike<{ 0: { transcript: string } }> }) => void) | null;
-  onerror: (() => void) | null;
-};
 
 const router = useRouter();
 const store = useTrainingStore();
@@ -58,18 +48,6 @@ function recordHandwriting(skipped: boolean) {
     drawingDataUrl: skipped ? undefined : canvas.value?.snapshot(),
     isCorrect: undefined,
     skipped,
-    timeSpentSeconds: Math.max(1, Math.round((Date.now() - startedAt.value) / 1000)),
-  });
-}
-
-function recordVoice(answer: string) {
-  store.setObjectNamingQuestion(currentIndex.value, {
-    ...current.value,
-    userAnswer: answer,
-    inputMethod: 'voice',
-    drawingDataUrl: hasDrawing.value ? canvas.value?.snapshot() : undefined,
-    isCorrect: isObjectAnswerCorrect(current.value, answer),
-    skipped: false,
     timeSpentSeconds: Math.max(1, Math.round((Date.now() - startedAt.value) / 1000)),
   });
 }
@@ -108,34 +86,6 @@ function skip() {
   moveOn();
 }
 
-function startVoice() {
-  const SpeechRecognition =
-    (window as unknown as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor })
-      .SpeechRecognition ??
-    (window as unknown as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor })
-      .webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    message.value = '当前浏览器不支持语音输入，可以使用手写完成。';
-    return;
-  }
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'zh-CN';
-  recognition.interimResults = false;
-  recognition.onresult = (event) => {
-    const answer = event.results[0][0].transcript;
-    recordVoice(answer);
-    waiting.value = true;
-    message.value = isObjectAnswerCorrect(current.value, answer) ? '很好，认出来啦。' : '已经认真尝试了，继续下一题。';
-    window.setTimeout(() => {
-      waiting.value = false;
-      moveOn();
-    }, 650);
-  };
-  recognition.onerror = () => {
-    message.value = '这次没有听清，可以再试一次，或使用手写完成。';
-  };
-  recognition.start();
-}
 </script>
 
 <style scoped>

@@ -18,7 +18,7 @@
         </div>
       </ResultCard>
       <p class="hint">{{ message }}</p>
-      <AppButton tone="quiet" block @click="skip">先跳过</AppButton>
+      <AppButton tone="quiet" block :disabled="waiting" @click="skip">先跳过</AppButton>
     </section>
   </PageContainer>
 </template>
@@ -44,29 +44,34 @@ const message = ref('请点一下不一样的那个。');
 const waiting = ref(false);
 
 function record(selectedIndex: number | undefined, skipped: boolean) {
+  const question = current.value;
   store.setOddOneOutQuestion(currentIndex.value, {
-    ...current.value,
+    ...question,
     selectedIndex,
     skipped,
-    isCorrect: skipped ? false : selectedIndex === current.value.answerIndex,
+    isCorrect: skipped ? false : selectedIndex === question.answerIndex,
     timeSpentSeconds: Math.max(1, Math.round((Date.now() - startedAt.value) / 1000)),
   });
 }
 
 function moveOn() {
-  if (currentIndex.value >= questions.length - 1) {
+  const nextIndex = questions.findIndex(
+    (question, index) => index > currentIndex.value && question.selectedIndex === undefined && !question.skipped,
+  );
+  if (nextIndex < 0) {
     router.push(nextTaskRoute(store.state.settings, session));
     return;
   }
-  currentIndex.value += 1;
+  currentIndex.value = nextIndex;
   message.value = '继续找下一个。';
   startedAt.value = Date.now();
 }
 
 function choose(index: number) {
+  const isCorrect = index === current.value.answerIndex;
   record(index, false);
   waiting.value = true;
-  message.value = index === current.value.answerIndex ? '找对啦，很细心。' : '已经认真找了，继续试试下一题。';
+  message.value = isCorrect ? '找对啦，很细心。' : '已经认真找了，继续试试下一题。';
   window.setTimeout(() => {
     waiting.value = false;
     moveOn();

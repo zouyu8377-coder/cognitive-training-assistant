@@ -26,10 +26,6 @@
           <option value="L6">L6：100 以内进退位加减</option>
         </select>
       </label>
-      <label class="check">
-        <input v-model="form.includeSubtraction" type="checkbox" />
-        包含减法
-      </label>
       <label>
         数字顺序练习
         <select v-model.number="form.numberConnectLevel">
@@ -66,7 +62,11 @@ const store = useTrainingStore();
 const form = reactive<TrainingSettings>({ ...store.state.settings });
 
 function save() {
-  store.updateSettings({ ...form, patientNickname: form.patientNickname.trim() || '家人' });
+  store.updateSettings({
+    ...form,
+    patientNickname: form.patientNickname.trim() || '家人',
+    includeSubtraction: ['L2', 'L4', 'L5', 'L6'].includes(form.mathLevel),
+  });
   router.push('/today');
 }
 </script>
