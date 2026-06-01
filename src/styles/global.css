@@ -1,0 +1,59 @@
+:root {
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  color: #26312f;
+  background: #f7f5ef;
+  font-size: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.muted {
+  color: #64706c;
+}
+
+.notice {
+  padding: 16px;
+  border: 1px solid #ddd6c3;
+  border-radius: 8px;
+  background: #fffdf7;
+  line-height: 1.7;
+}
+
+@media (max-width: 520px) {
+  :root {
+    font-size: 17px;
+  }
+
+  .page {
+    padding: 16px;
+  }
+}
