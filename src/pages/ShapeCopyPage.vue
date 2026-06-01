@@ -6,17 +6,31 @@
         <h2>请照着画一个{{ task.shapeName }}</h2>
         <LineArt :kind="task.shapeKind" :label="task.shapeName" />
       </ResultCard>
+
       <DrawingCanvas ref="canvas" @redraw="redrawCount += 1" />
       <p class="hint">{{ message }}</p>
-      <AppButton tone="quiet" block @click="clearCanvas">重新绘制</AppButton>
-      <AppButton block @click="finish(true)">已完成</AppButton>
-      <AppButton tone="secondary" block @click="finish(false)">今天先不画</AppButton>
+
+      <ResultCard v-if="latestAttempt">
+        <h2>这次画完啦</h2>
+        <p>{{ latestAttempt.metrics.feedbackText }}</p>
+        <p class="muted">已经尝试 {{ attempts.length }} 次。</p>
+      </ResultCard>
+
+      <AppButton tone="quiet" block @click="clearCanvas">清空重画</AppButton>
+      <AppButton block @click="completeAttempt">完成并查看结果</AppButton>
+      <AppButton v-if="latestAttempt" tone="secondary" block @click="drawAgain">再画一次</AppButton>
+      <AppButton v-if="latestAttempt" block @click="saveAttempt(latestAttempt.id)">保存这次并继续</AppButton>
+      <AppButton v-if="bestAttempt && attempts.length > 1" tone="secondary" block @click="saveAttempt(bestAttempt.id)">
+        保存表现最好的一次
+      </AppButton>
+      <AppButton tone="secondary" block @click="skip(false)">今天先不画</AppButton>
+      <AppButton tone="quiet" block @click="skip(true)">需要家属帮助</AppButton>
     </section>
   </PageContainer>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppButton from '../components/AppButton.vue';
 import DrawingCanvas from '../components/DrawingCanvas.vue';
@@ -25,6 +39,8 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
+import type { ShapeDrawingAttempt } from '../types';
+import { bestShapeAttempt, evaluateShapeDrawing } from '../utils/drawingEvaluation';
 import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
@@ -32,25 +48,77 @@ const store = useTrainingStore();
 const session = store.ensureSession();
 const task = session.shapeCopyTask!;
 const canvas = ref<InstanceType<typeof DrawingCanvas>>();
-const startedAt = Date.now();
 const redrawCount = ref(task.redrawCount ?? 0);
-const message = ref('照着上面的图形，在空白区画一画。');
+const attempts = ref<ShapeDrawingAttempt[]>(task.attempts ?? []);
+const latestAttempt = ref<ShapeDrawingAttempt>();
+const message = ref('请照着示例，在下面的方框里画一遍。');
+const bestAttempt = computed(() => bestShapeAttempt(attempts.value));
 
-function clearCanvas() {
-  canvas.value?.clear();
-  message.value = '可以重新画。';
-}
-
-function finish(completed: boolean) {
+function persistDraft(selectedAttemptId?: string, completed = false, skipped = false) {
+  const selected = attempts.value.find((attempt) => attempt.id === selectedAttemptId) ?? latestAttempt.value;
   store.setShapeCopyTask({
     ...task,
     completed,
-    skipped: !completed,
+    skipped,
     redrawCount: redrawCount.value,
-    drawingDataUrl: completed ? canvas.value?.snapshot() : undefined,
-    durationSeconds: Math.max(1, Math.round((Date.now() - startedAt) / 1000)),
+    attempts: attempts.value,
+    selectedAttemptId: selectedAttemptId ?? selected?.id,
+    drawingDataUrl: selected?.imageDataUrl,
+    durationSeconds: selected?.metrics.durationSeconds,
   });
-  message.value = completed ? '画得很好，完成啦。' : '今天先放一放也可以。';
+}
+
+function clearCanvas() {
+  canvas.value?.clear();
+  latestAttempt.value = undefined;
+  message.value = '可以重新画。';
+}
+
+function completeAttempt() {
+  const points = canvas.value?.getPoints() ?? [];
+  if (points.length < 6) {
+    message.value = '可以先画几笔，再查看结果。';
+    return;
+  }
+  const metrics = evaluateShapeDrawing(task.shapeKind, points);
+  const attempt: ShapeDrawingAttempt = {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    shapeType: task.shapeKind,
+    points,
+    imageDataUrl: canvas.value?.snapshot(),
+    metrics,
+    createdAt: new Date().toISOString(),
+  };
+  latestAttempt.value = attempt;
+  attempts.value = [attempt, ...attempts.value].slice(0, 3);
+  persistDraft(attempt.id);
+  message.value = metrics.feedbackText;
+}
+
+function drawAgain() {
+  canvas.value?.clear();
+  latestAttempt.value = undefined;
+  message.value = '没关系，我们再试一次。可以慢慢画，不着急。';
+}
+
+function saveAttempt(attemptId: string) {
+  persistDraft(attemptId, true, false);
+  message.value = '已保存本次练习。';
+  router.push(nextTaskRoute(store.state.settings, session));
+}
+
+function skip(helpNeeded: boolean) {
+  store.setShapeCopyTask({
+    ...task,
+    completed: false,
+    skipped: true,
+    redrawCount: redrawCount.value,
+    attempts: attempts.value,
+    selectedAttemptId: bestAttempt.value?.id,
+    drawingDataUrl: bestAttempt.value?.imageDataUrl,
+    durationSeconds: bestAttempt.value?.metrics.durationSeconds,
+  });
+  message.value = helpNeeded ? '可以请家属帮忙。' : '今天先放一放也可以。';
   router.push(nextTaskRoute(store.state.settings, session));
 }
 </script>

@@ -2,6 +2,8 @@ export type MathLevel = 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | 'L6';
 export type NumberConnectLevel = 5 | 10 | 15;
 export type PatientMood = 'calm' | 'happy' | 'tired' | 'resistant' | 'need_lower_difficulty';
 export type PreTrainingStatus = 'steady' | 'tired' | 'low_mood' | 'not_willing';
+export type ShapeType = 'circle' | 'rectangle' | 'triangle';
+export type DrawingLevel = 'excellent' | 'good' | 'completed' | 'try_again';
 
 export interface TrainingSettings {
   patientNickname: string;
@@ -46,12 +48,48 @@ export interface ObjectNamingQuestion {
 export interface ShapeCopyTask {
   id: string;
   shapeName: string;
-  shapeKind: 'circle' | 'rectangle' | 'diamond' | 'triangle' | 'star';
+  shapeKind: ShapeType;
   completed?: boolean;
   skipped?: boolean;
   redrawCount: number;
   drawingDataUrl?: string;
   durationSeconds?: number;
+  attempts?: ShapeDrawingAttempt[];
+  selectedAttemptId?: string;
+}
+
+export interface DrawingPoint {
+  x: number;
+  y: number;
+  t: number;
+  strokeId: string;
+}
+
+export interface ShapeDrawingMetrics {
+  shapeType: ShapeType;
+  durationSeconds: number;
+  strokeCount: number;
+  pointCount: number;
+  coverageRate?: number;
+  precisionRate?: number;
+  closureRate?: number;
+  aspectScore?: number;
+  extraStrokeRate?: number;
+  radialError?: number;
+  circularCoverage?: number;
+  score: number;
+  level: DrawingLevel;
+  feedbackText: string;
+  caregiverText: string;
+}
+
+export interface ShapeDrawingAttempt {
+  id: string;
+  shapeType: ShapeType;
+  points: DrawingPoint[];
+  imageDataUrl?: string;
+  metrics: ShapeDrawingMetrics;
+  createdAt: string;
 }
 
 export interface OddOneOutQuestion {

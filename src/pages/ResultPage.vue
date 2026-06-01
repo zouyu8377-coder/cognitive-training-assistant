@@ -56,14 +56,19 @@
         <h2>图形临摹记录</h2>
         <p>图形：{{ session.shapeCopyTask?.shapeName ?? '未记录' }}</p>
         <p>状态：{{ shapeCopyText }}</p>
+        <p>尝试次数：{{ shapeAttemptCount }}</p>
         <p>重新绘制：{{ session.shapeCopyTask?.redrawCount ?? 0 }} 次</p>
         <p>用时：{{ formatDuration(session.shapeCopyTask?.durationSeconds) }}</p>
-        <img
-          v-if="session.shapeCopyTask?.drawingDataUrl"
-          class="drawing-preview"
-          :src="session.shapeCopyTask.drawingDataUrl"
-          alt="图形临摹记录"
-        />
+        <p v-if="bestShapeAttempt">表现最好一次：{{ drawingLevelText(bestShapeAttempt.metrics.level) }}</p>
+        <p v-if="bestShapeAttempt">实际评分：{{ bestShapeAttempt.metrics.score }} / 100</p>
+        <p v-if="bestShapeAttempt">笔画数：{{ bestShapeAttempt.metrics.strokeCount }}</p>
+        <p v-if="bestShapeAttempt">轨迹点数：{{ bestShapeAttempt.metrics.pointCount }}</p>
+        <p v-if="bestShapeAttempt">覆盖度：{{ percentText(bestShapeAttempt.metrics.coverageRate) }}</p>
+        <p v-if="bestShapeAttempt">贴近度：{{ percentText(bestShapeAttempt.metrics.precisionRate) }}</p>
+        <p v-if="bestShapeAttempt">闭合度：{{ percentText(bestShapeAttempt.metrics.closureRate) }}</p>
+        <p v-if="bestShapeAttempt">{{ bestShapeAttempt.metrics.caregiverText }}</p>
+        <p class="muted">图形结果仅用于家庭训练记录和完成度参考，不代表医学评估结果。</p>
+        <img v-if="bestShapeAttempt?.imageDataUrl" class="drawing-preview" :src="bestShapeAttempt.imageDataUrl" alt="表现最好一次" />
       </ResultCard>
 
       <ResultCard>
@@ -125,6 +130,7 @@ import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
 import type { MathQuestion, ObjectNamingQuestion, PatientMood, TrainingSession } from '../types';
 import { formatDuration } from '../utils/date';
+import { bestShapeAttempt as getBestShapeAttempt } from '../utils/drawingEvaluation';
 import { buildNextTrainingSuggestions, patientMoodText, preTrainingStatusText } from '../utils/sessionInsights';
 import { findSession } from '../utils/storage';
 
@@ -172,6 +178,8 @@ const shapeCopyText = computed(() => {
   if (session.value?.shapeCopyTask?.skipped) return '今天先不画';
   return '未记录';
 });
+const shapeAttemptCount = computed(() => session.value?.shapeCopyTask?.attempts?.length ?? 0);
+const bestShapeAttempt = computed(() => getBestShapeAttempt(session.value?.shapeCopyTask?.attempts));
 const suggestions = computed(() =>
   session.value ? buildNextTrainingSuggestions({ ...session.value, patientMood: mood.value }) : [],
 );
@@ -224,6 +232,20 @@ function objectInputText(method?: ObjectNamingQuestion['inputMethod']): string {
     skipped: '暂未作答',
   };
   return method ? map[method] : '未记录';
+}
+
+function percentText(value?: number): string {
+  return value === undefined ? '未记录' : `${Math.round(value * 100)}%`;
+}
+
+function drawingLevelText(level: string): string {
+  const map: Record<string, string> = {
+    excellent: '完成较完整',
+    good: '完成不错',
+    completed: '已完成',
+    try_again: '已尝试完成',
+  };
+  return map[level] ?? '已记录';
 }
 </script>
 

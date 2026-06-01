@@ -14,10 +14,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import type { DrawingPoint } from '../types';
 
 const emit = defineEmits<{ redraw: [] }>();
 const canvas = ref<HTMLCanvasElement>();
 const drawing = ref(false);
+const points = ref<DrawingPoint[]>([]);
+const strokeId = ref('');
 
 function context() {
   const ctx = canvas.value?.getContext('2d');
@@ -39,8 +42,10 @@ function point(event: PointerEvent) {
 
 function startDraw(event: PointerEvent) {
   drawing.value = true;
+  strokeId.value = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const ctx = context();
   const pos = point(event);
+  points.value.push({ ...pos, t: Date.now(), strokeId: strokeId.value });
   ctx?.beginPath();
   ctx?.moveTo(pos.x, pos.y);
 }
@@ -49,6 +54,7 @@ function draw(event: PointerEvent) {
   if (!drawing.value) return;
   const ctx = context();
   const pos = point(event);
+  points.value.push({ ...pos, t: Date.now(), strokeId: strokeId.value });
   ctx?.lineTo(pos.x, pos.y);
   ctx?.stroke();
 }
@@ -60,6 +66,7 @@ function stopDraw() {
 function clear(shouldEmit = true) {
   const ctx = context();
   if (canvas.value) ctx?.clearRect(0, 0, canvas.value.width, canvas.value.height);
+  points.value = [];
   if (shouldEmit) emit('redraw');
 }
 
@@ -67,7 +74,18 @@ function snapshot(): string | undefined {
   return canvas.value?.toDataURL('image/png');
 }
 
-defineExpose({ clear, snapshot });
+function getPoints(): DrawingPoint[] {
+  return points.value.map((item) => ({ ...item }));
+}
+
+function getSize() {
+  return {
+    width: canvas.value?.width ?? 620,
+    height: canvas.value?.height ?? 300,
+  };
+}
+
+defineExpose({ clear, snapshot, getPoints, getSize });
 
 onMounted(() => {
   clear(false);

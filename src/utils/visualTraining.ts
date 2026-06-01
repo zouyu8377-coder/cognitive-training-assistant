@@ -14,9 +14,7 @@ const objectBank: Array<Omit<ObjectNamingQuestion, 'id'>> = [
 const shapes: Array<Pick<ShapeCopyTask, 'shapeName' | 'shapeKind'>> = [
   { shapeName: '圆形', shapeKind: 'circle' },
   { shapeName: '矩形', shapeKind: 'rectangle' },
-  { shapeName: '菱形', shapeKind: 'diamond' },
   { shapeName: '三角形', shapeKind: 'triangle' },
-  { shapeName: '五角星', shapeKind: 'star' },
 ];
 
 const oddBank = [
