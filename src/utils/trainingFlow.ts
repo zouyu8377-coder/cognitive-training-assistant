@@ -1,9 +1,9 @@
-import type { TrainingSession, TrainingSettings } from '../types';
+import type { ObjectNamingQuestion, TrainingSession, TrainingSettings } from '../types';
 
 export function nextTaskRoute(settings: TrainingSettings, session: TrainingSession): string {
   const hasPendingMath = session.mathQuestions.some((question) => question.userAnswer === undefined && !question.skipped);
   const objectQuestions = session.objectNamingQuestions ?? [];
-  const hasPendingObjects = objectQuestions.some((question) => question.userAnswer === undefined && !question.skipped);
+  const hasPendingObjects = objectQuestions.some((question) => !isObjectQuestionHandled(question));
   const oddQuestions = session.oddOneOutQuestions ?? [];
   const hasPendingOdd = oddQuestions.some((question) => question.selectedIndex === undefined && !question.skipped);
   if (hasPendingMath) return '/math';
@@ -18,7 +18,7 @@ export function nextTaskRoute(settings: TrainingSettings, session: TrainingSessi
 
 export function firstPendingObjectIndex(session: TrainingSession): number {
   const questions = session.objectNamingQuestions ?? [];
-  const pendingIndex = questions.findIndex((question) => question.userAnswer === undefined && !question.skipped);
+  const pendingIndex = questions.findIndex((question) => !isObjectQuestionHandled(question));
   return pendingIndex >= 0 ? pendingIndex : Math.max(0, questions.length - 1);
 }
 
@@ -37,4 +37,8 @@ export function firstPendingMathIndex(session: TrainingSession): number {
 
 export function isSessionComplete(settings: TrainingSettings, session: TrainingSession): boolean {
   return nextTaskRoute(settings, session) === '/complete' && Boolean(session.completedAt);
+}
+
+function isObjectQuestionHandled(question: ObjectNamingQuestion): boolean {
+  return Boolean(question.skipped || question.userAnswer || question.drawingDataUrl || question.inputMethod === 'handwriting');
 }
