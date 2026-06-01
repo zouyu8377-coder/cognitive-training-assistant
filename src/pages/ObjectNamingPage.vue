@@ -5,7 +5,7 @@
       <ResultCard>
         <LineArt :kind="current.icon" :label="current.name" />
       </ResultCard>
-      <DrawingCanvas ref="canvas" @redraw="hasDrawing = true" />
+      <DrawingCanvas ref="canvas" @draw="hasDrawing = true" />
       <p class="hint">{{ message }}</p>
       <div class="primary-actions">
         <AppButton tone="quiet" :disabled="waiting" @click="rewrite">重写</AppButton>
@@ -87,10 +87,6 @@ function moveOn() {
 }
 
 function submitHandwriting() {
-  if (!hasDrawing.value) {
-    message.value = '可以先在空白区写一写，也可以先跳过。';
-    return;
-  }
   recordHandwriting(false);
   waiting.value = true;
   message.value = '写好啦，家属稍后可以查看。';

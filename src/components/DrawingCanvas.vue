@@ -16,7 +16,7 @@
 import { onMounted, ref } from 'vue';
 import type { DrawingPoint } from '../types';
 
-const emit = defineEmits<{ redraw: [] }>();
+const emit = defineEmits<{ redraw: []; draw: [] }>();
 const canvas = ref<HTMLCanvasElement>();
 const drawing = ref(false);
 const points = ref<DrawingPoint[]>([]);
@@ -42,6 +42,7 @@ function point(event: PointerEvent) {
 
 function startDraw(event: PointerEvent) {
   drawing.value = true;
+  emit('draw');
   strokeId.value = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const ctx = context();
   const pos = point(event);
