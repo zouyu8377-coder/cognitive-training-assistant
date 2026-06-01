@@ -13,18 +13,14 @@
       <ResultCard v-if="latestAttempt">
         <h2>这次画完啦</h2>
         <p>{{ latestAttempt.metrics.feedbackText }}</p>
-        <p class="muted">已经尝试 {{ attempts.length }} 次。</p>
+        <p class="muted">已经尝试 {{ attempts.length }} 次。{{ bestSavedMessage }}</p>
       </ResultCard>
 
       <AppButton tone="quiet" block @click="clearCanvas">清空重画</AppButton>
       <AppButton block @click="completeAttempt">完成并查看结果</AppButton>
       <AppButton v-if="latestAttempt" tone="secondary" block @click="drawAgain">再画一次</AppButton>
-      <AppButton v-if="latestAttempt" block @click="saveAttempt(latestAttempt.id)">保存这次并继续</AppButton>
-      <AppButton v-if="bestAttempt && attempts.length > 1" tone="secondary" block @click="saveAttempt(bestAttempt.id)">
-        保存表现最好的一次
-      </AppButton>
-      <AppButton tone="secondary" block @click="skip(false)">今天先不画</AppButton>
-      <AppButton tone="quiet" block @click="skip(true)">需要家属帮助</AppButton>
+      <AppButton v-if="latestAttempt" block @click="saveAndContinue">保存并继续</AppButton>
+      <AppButton tone="secondary" block @click="skip">今天先不画</AppButton>
     </section>
   </PageContainer>
 </template>
@@ -53,9 +49,12 @@ const attempts = ref<ShapeDrawingAttempt[]>(task.attempts ?? []);
 const latestAttempt = ref<ShapeDrawingAttempt>();
 const message = ref('请照着示例，在下面的方框里画一遍。');
 const bestAttempt = computed(() => bestShapeAttempt(attempts.value));
+const bestSavedMessage = computed(() =>
+  latestAttempt.value?.id === bestAttempt.value?.id ? '这次已经作为当前最好结果保存。' : '当前保留表现更好的一次。',
+);
 
 function persistDraft(selectedAttemptId?: string, completed = false, skipped = false) {
-  const selected = attempts.value.find((attempt) => attempt.id === selectedAttemptId) ?? latestAttempt.value;
+  const selected = attempts.value.find((attempt) => attempt.id === selectedAttemptId) ?? bestAttempt.value ?? latestAttempt.value;
   store.setShapeCopyTask({
     ...task,
     completed,
@@ -91,7 +90,8 @@ function completeAttempt() {
   };
   latestAttempt.value = attempt;
   attempts.value = [attempt, ...attempts.value].slice(0, 3);
-  persistDraft(attempt.id);
+  const selected = bestShapeAttempt(attempts.value);
+  persistDraft(selected?.id);
   message.value = metrics.feedbackText;
 }
 
@@ -101,13 +101,13 @@ function drawAgain() {
   message.value = '没关系，我们再试一次。可以慢慢画，不着急。';
 }
 
-function saveAttempt(attemptId: string) {
-  persistDraft(attemptId, true, false);
+function saveAndContinue() {
+  persistDraft(bestAttempt.value?.id, true, false);
   message.value = '已保存本次练习。';
   router.push(nextTaskRoute(store.state.settings, session));
 }
 
-function skip(helpNeeded: boolean) {
+function skip() {
   store.setShapeCopyTask({
     ...task,
     completed: false,
@@ -118,7 +118,7 @@ function skip(helpNeeded: boolean) {
     drawingDataUrl: bestAttempt.value?.imageDataUrl,
     durationSeconds: bestAttempt.value?.metrics.durationSeconds,
   });
-  message.value = helpNeeded ? '可以请家属帮忙。' : '今天先放一放也可以。';
+  message.value = '今天先放一放也可以。';
   router.push(nextTaskRoute(store.state.settings, session));
 }
 </script>
