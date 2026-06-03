@@ -1,6 +1,6 @@
 <template>
   <header class="progress-header">
-    <button class="back" type="button" @click="$router.back()">返回</button>
+    <button class="back" type="button" @click="goBack">返回</button>
     <div>
       <p>{{ label }}</p>
       <strong>{{ title }}</strong>
@@ -9,7 +9,15 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+
 defineProps<{ title: string; label?: string }>();
+
+const router = useRouter();
+
+function goBack() {
+  router.back();
+}
 </script>
 
 <style scoped>

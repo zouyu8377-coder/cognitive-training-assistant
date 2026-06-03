@@ -1,7 +1,7 @@
 <template>
   <PageContainer>
     <ProgressHeader title="数字顺序练习" :label="orderLabel" />
-    <section class="stack">
+    <section class="number-task">
       <div class="board">
         <button
           v-for="dot in dots"
@@ -16,7 +16,9 @@
         </button>
       </div>
       <p class="hint">{{ hint }}</p>
-      <AppButton tone="quiet" block @click="finish(false)">今天先到这里</AppButton>
+      <div class="actions">
+        <AppButton tone="quiet" block @click="finish(false)">今天先到这里</AppButton>
+      </div>
     </section>
   </PageContainer>
 </template>
@@ -95,10 +97,17 @@ function tap(value: number) {
 </script>
 
 <style scoped>
+.number-task {
+  min-height: calc(100svh - 116px);
+  display: grid;
+  grid-template-rows: minmax(300px, 1fr) minmax(30px, auto) auto;
+  gap: 12px;
+}
+
 .board {
   position: relative;
-  height: min(68vh, 520px);
-  min-height: 430px;
+  height: 100%;
+  min-height: 300px;
   border: 1px solid #d8dccf;
   border-radius: 8px;
   background: #fffdf7;
@@ -106,14 +115,14 @@ function tap(value: number) {
 
 .dot {
   position: absolute;
-  width: 64px;
-  height: 64px;
+  width: clamp(52px, 13vw, 64px);
+  height: clamp(52px, 13vw, 64px);
   transform: translate(-50%, -50%);
   border: 2px solid #78a08f;
   border-radius: 50%;
   background: #ffffff;
   color: #213633;
-  font-size: 1.45rem;
+  font-size: clamp(1.18rem, 5vw, 1.45rem);
   font-weight: 900;
 }
 
@@ -124,7 +133,22 @@ function tap(value: number) {
 
 .hint {
   min-height: 30px;
+  margin: 0;
   font-size: 1.08rem;
   color: #52615d;
+}
+
+.actions {
+  position: sticky;
+  bottom: 10px;
+  background: #f7f5ef;
+}
+
+@media (max-height: 700px) {
+  .number-task {
+    min-height: calc(100svh - 96px);
+    grid-template-rows: minmax(260px, 1fr) minmax(28px, auto) auto;
+    gap: 8px;
+  }
 }
 </style>

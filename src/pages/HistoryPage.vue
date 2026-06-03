@@ -77,10 +77,10 @@ function moodText(mood?: PatientMood) {
 }
 
 .date-picker input {
-  min-height: 56px;
+  min-height: 48px;
   border: 1px solid #c9d6cf;
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   background: #ffffff;
 }
 

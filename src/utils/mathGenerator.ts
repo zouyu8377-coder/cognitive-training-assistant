@@ -35,9 +35,14 @@ function borrowSubtractionPair(): [number, number] {
   return [a, b];
 }
 
-function generateOne(level: MathLevel, includeSubtraction: boolean, index: number): MathQuestion {
-  const allowSubtraction = ['L2', 'L4', 'L5', 'L6'].includes(level);
-  const operator: '+' | '-' = allowSubtraction && Math.random() > 0.55 ? '-' : '+';
+function generateOne(
+  level: MathLevel,
+  includeSubtraction: boolean,
+  index: number,
+  forcedOperator?: '+' | '-',
+): MathQuestion {
+  const allowSubtraction = includeSubtraction && ['L2', 'L4', 'L5', 'L6'].includes(level);
+  const operator: '+' | '-' = forcedOperator ?? (allowSubtraction && Math.random() > 0.55 ? '-' : '+');
 
   if (level === 'L1') {
     const a = randomInt(0, 10);
@@ -96,5 +101,9 @@ export function generateMathQuestions(
   count: 5 | 10 | 15 | 20,
   includeSubtraction: boolean,
 ): MathQuestion[] {
-  return Array.from({ length: count }, (_, index) => generateOne(level, includeSubtraction, index));
+  const allowSubtraction = includeSubtraction && ['L2', 'L4', 'L5', 'L6'].includes(level);
+  const subtractionSlots = allowSubtraction ? new Set([1, Math.floor(count / 2), count - 2].filter((index) => index >= 0)) : new Set();
+  return Array.from({ length: count }, (_, index) =>
+    generateOne(level, includeSubtraction, index, subtractionSlots.has(index) ? '-' : undefined),
+  );
 }

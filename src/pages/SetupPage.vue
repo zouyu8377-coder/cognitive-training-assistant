@@ -18,12 +18,12 @@
       <label>
         数学难度
         <select v-model="form.mathLevel">
-          <option value="L1">L1：10 以内加法</option>
-          <option value="L2">L2：10 以内加减</option>
-          <option value="L3">L3：20 以内加法</option>
-          <option value="L4">L4：20 以内加减</option>
-          <option value="L5">L5：100 以内简单加减</option>
-          <option value="L6">L6：100 以内进退位加减</option>
+          <option value="L1">简单：10 以内加法</option>
+          <option value="L2">简单：10 以内加减</option>
+          <option value="L3">中等：20 以内加法</option>
+          <option value="L4">中等：20 以内加减</option>
+          <option value="L5">困难：100 以内简单加减</option>
+          <option value="L6">困难：100 以内进退位加减</option>
         </select>
       </label>
       <label>
@@ -80,10 +80,10 @@ label {
 
 input,
 select {
-  min-height: 54px;
+  min-height: 48px;
   border: 1px solid #c9d6cf;
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   background: #ffffff;
 }
 

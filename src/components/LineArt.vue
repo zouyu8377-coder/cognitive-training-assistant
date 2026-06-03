@@ -1,5 +1,6 @@
 <template>
-  <svg class="line-art" viewBox="0 0 160 130" role="img" :aria-label="label">
+  <img v-if="isImage" class="object-image" :src="kind" :alt="label" />
+  <svg v-else class="line-art" viewBox="0 0 160 130" role="img" :aria-label="label">
     <g v-if="kind === 'zebra'" fill="none" stroke="#26312f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M29 73c6-25 35-39 70-31 15 4 25 11 31 22 8 16-1 34-22 42-29 12-69 6-82-15-4-6-4-12 3-18z" />
       <path d="M123 55c11-13 28-7 30 7 3 14-8 25-21 21M136 51l3-17M147 55l11-10" />
@@ -54,7 +55,10 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ kind: string; label: string }>();
+import { computed } from 'vue';
+
+const props = defineProps<{ kind: string; label: string }>();
+const isImage = computed(() => /\.(jpe?g|png|webp|gif|svg)$/i.test(props.kind));
 </script>
 
 <style scoped>
@@ -64,5 +68,14 @@ defineProps<{ kind: string; label: string }>();
   aspect-ratio: 1.23;
   display: block;
   margin: 0 auto;
+}
+
+.object-image {
+  width: 100%;
+  max-width: 360px;
+  max-height: 280px;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
 }
 </style>

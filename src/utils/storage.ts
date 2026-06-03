@@ -7,8 +7,8 @@ const DRAFT_SESSION_KEY = 'cta-draft-session';
 export const defaultSettings: TrainingSettings = {
   patientNickname: '家人',
   mathQuestionCount: 10,
-  mathLevel: 'L3',
-  includeSubtraction: false,
+  mathLevel: 'L4',
+  includeSubtraction: true,
   numberConnectLevel: 10,
   includeWritingTask: true,
   includeSingingTask: true,
@@ -40,10 +40,7 @@ export function loadSessions(): TrainingSession[] {
 
 export function saveSession(session: TrainingSession): void {
   const sessions = loadSessions();
-  const next = normalizeDailySessions([
-    session,
-    ...sessions.filter((item) => item.id !== session.id && item.date !== session.date),
-  ]);
+  const next = normalizeDailySessions([session, ...sessions.filter((item) => item.id !== session.id)]);
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(next));
 }
 
@@ -78,9 +75,5 @@ function sessionTime(session: TrainingSession): number {
 }
 
 function normalizeDailySessions(sessions: TrainingSession[]): TrainingSession[] {
-  const byDate = new Map<string, TrainingSession>();
-  for (const session of [...sessions].sort((a, b) => sessionTime(b) - sessionTime(a))) {
-    if (!byDate.has(session.date)) byDate.set(session.date, session);
-  }
-  return [...byDate.values()].sort((a, b) => sessionTime(b) - sessionTime(a));
+  return [...sessions].sort((a, b) => sessionTime(b) - sessionTime(a));
 }

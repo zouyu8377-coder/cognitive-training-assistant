@@ -1,14 +1,12 @@
 import type { ObjectNamingQuestion, OddOneOutQuestion, ShapeCopyTask } from '../types';
 
+const objectImageBase = `${import.meta.env.BASE_URL}object-images/`;
+
 const objectBank: Array<Omit<ObjectNamingQuestion, 'id'>> = [
-  { name: '斑马', aliases: ['斑马'], icon: 'zebra' },
-  { name: '尺子', aliases: ['尺子', '直尺'], icon: 'ruler' },
-  { name: '桌子', aliases: ['桌子', '书桌', '餐桌'], icon: 'table' },
-  { name: '苹果', aliases: ['苹果'], icon: 'apple' },
-  { name: '雨伞', aliases: ['雨伞', '伞'], icon: 'umbrella' },
-  { name: '杯子', aliases: ['杯子', '水杯'], icon: 'cup' },
-  { name: '钥匙', aliases: ['钥匙'], icon: 'key' },
-  { name: '鞋子', aliases: ['鞋子'], icon: 'shoe' },
+  { name: '图片 1', aliases: [], icon: `${objectImageBase}eagle.jpg` },
+  { name: '图片 2', aliases: [], icon: `${objectImageBase}cat.jpg` },
+  { name: '图片 3', aliases: [], icon: `${objectImageBase}dog.jpg` },
+  { name: '图片 4', aliases: [], icon: `${objectImageBase}deer.jpg` },
 ];
 
 const shapes: Array<Pick<ShapeCopyTask, 'shapeName' | 'shapeKind'>> = [
@@ -50,7 +48,7 @@ function shuffle<T>(items: T[]): T[] {
   return [...items].sort(() => Math.random() - 0.5);
 }
 
-export function generateObjectNamingQuestions(count = 3): ObjectNamingQuestion[] {
+export function generateObjectNamingQuestions(count = 4): ObjectNamingQuestion[] {
   return shuffle(objectBank)
     .slice(0, count)
     .map((item, index) => ({ ...item, id: randomId('object', index) }));

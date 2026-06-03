@@ -21,11 +21,12 @@ withDefaults(
 
 <style scoped>
 .app-button {
-  min-height: 56px;
+  min-height: 42px;
   border: 0;
   border-radius: 8px;
-  padding: 14px 20px;
-  font-size: 1.08rem;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  line-height: 1.35;
   font-weight: 700;
   cursor: pointer;
 }
@@ -53,5 +54,13 @@ withDefaults(
   color: #36504a;
   background: transparent;
   border: 1px solid #c8d5cc;
+}
+
+@media (max-width: 520px) {
+  .app-button {
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 0.94rem;
+  }
 }
 </style>

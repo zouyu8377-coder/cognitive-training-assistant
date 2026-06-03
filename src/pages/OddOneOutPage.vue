@@ -108,6 +108,7 @@ h2 {
 
 .hint {
   min-height: 28px;
+  margin: 0;
   color: #52615d;
 }
 </style>

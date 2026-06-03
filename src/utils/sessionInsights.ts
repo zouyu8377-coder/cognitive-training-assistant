@@ -34,13 +34,6 @@ export function buildNextTrainingSuggestions(session: TrainingSession): string[]
     suggestions.push('数字顺序练习出现多次重新尝试。下次可以先选择更少数字，例如 1-5 或 1-10。');
   }
 
-  const objectQuestions = session.objectNamingQuestions ?? [];
-  const objectAnswered = objectQuestions.filter((question) => !question.skipped).length;
-  const objectCorrect = objectQuestions.filter((question) => question.isCorrect).length;
-  if (objectAnswered > 0 && objectCorrect / objectAnswered < 0.6) {
-    suggestions.push('看图说名称可以先选更熟悉的常见物品，鼓励表达和尝试。');
-  }
-
   const oddQuestions = session.oddOneOutQuestions ?? [];
   const oddAnswered = oddQuestions.filter((question) => !question.skipped).length;
   const oddCorrect = oddQuestions.filter((question) => question.isCorrect).length;

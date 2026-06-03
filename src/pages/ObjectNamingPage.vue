@@ -1,11 +1,11 @@
 <template>
   <PageContainer>
-    <ProgressHeader :title="`看图说名称 ${currentIndex + 1}/${questions.length}`" label="看一看，说一说" />
+    <ProgressHeader :title="`看图写名称 ${currentIndex + 1}/${questions.length}`" label="看一看，写一写" />
     <section class="stack">
       <ResultCard>
         <LineArt :kind="current.icon" :label="current.name" />
       </ResultCard>
-      <DrawingCanvas ref="canvas" @draw="hasDrawing = true" />
+      <DrawingCanvas ref="canvas" inactive-label="手写区" active-label="正在手写" @draw="hasDrawing = true" />
       <p class="hint">{{ message }}</p>
       <div class="primary-actions">
         <AppButton tone="quiet" :disabled="waiting" @click="rewrite">重写</AppButton>
@@ -35,7 +35,7 @@ const questions = session.objectNamingQuestions ?? [];
 const currentIndex = ref(firstPendingObjectIndex(session));
 const canvas = ref<InstanceType<typeof DrawingCanvas>>();
 const hasDrawing = ref(false);
-const message = ref('可以在空白区手写名称，也可以点语音输入。');
+const message = ref('可以在空白区手写名称，写好后点手写完成。');
 const waiting = ref(false);
 const startedAt = ref(Date.now());
 const current = computed(() => questions[currentIndex.value]);
@@ -91,6 +91,7 @@ function skip() {
 <style scoped>
 .hint {
   min-height: 28px;
+  margin: 0;
   color: #52615d;
 }
 
@@ -98,5 +99,8 @@ function skip() {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  position: sticky;
+  bottom: 10px;
+  background: #f7f5ef;
 }
 </style>

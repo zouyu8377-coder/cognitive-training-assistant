@@ -13,7 +13,7 @@
         <p>数字顺序：{{ session.numberConnectResult?.completed ? '已完成' : '未完成' }}</p>
         <p>重新尝试点击：{{ session.numberConnectResult?.wrongClicks ?? 0 }} 次</p>
         <p>数字顺序耗时：{{ formatDuration(session.numberConnectResult?.durationSeconds) }}</p>
-        <p>看图说名称：{{ objectCorrect }} / {{ objectTotal }}</p>
+        <p>看图写名称：{{ objectCompleted }} / {{ objectTotal }}</p>
         <p>照着画图形：{{ shapeCopyText }}</p>
         <p>找不同：{{ oddCorrect }} / {{ oddTotal }}</p>
         <p>写名字：{{ writingText }}</p>
@@ -39,13 +39,12 @@
       </ResultCard>
 
       <ResultCard>
-        <h2>看图说名称记录</h2>
+        <h2>看图写名称记录</h2>
         <div class="question-list">
           <div v-for="(question, index) in session.objectNamingQuestions ?? []" :key="question.id" class="question-row">
-            <strong>第 {{ index + 1 }} 题：{{ question.name }}</strong>
-            <span>作答：{{ question.userAnswer || '暂未作答' }}</span>
+            <strong>第 {{ index + 1 }} 题</strong>
             <span>方式：{{ objectInputText(question.inputMethod) }}</span>
-            <span>情况：{{ objectiveStatusText(question.isCorrect, question.skipped) }}</span>
+            <span>情况：{{ question.skipped ? '暂未作答' : question.drawingDataUrl ? '已完成' : '未记录' }}</span>
             <span>用时：{{ formatDuration(question.timeSpentSeconds) }}</span>
             <img v-if="question.drawingDataUrl" class="drawing-preview" :src="question.drawingDataUrl" alt="手写记录" />
           </div>
@@ -151,7 +150,9 @@ const mathDuration = computed(() =>
   session.value?.mathQuestions.reduce((sum, q) => sum + (q.timeSpentSeconds ?? 0), 0) ?? 0,
 );
 const objectTotal = computed(() => session.value?.objectNamingQuestions?.length ?? 0);
-const objectCorrect = computed(() => session.value?.objectNamingQuestions?.filter((q) => q.isCorrect).length ?? 0);
+const objectCompleted = computed(
+  () => session.value?.objectNamingQuestions?.filter((q) => q.drawingDataUrl || q.inputMethod === 'handwriting').length ?? 0,
+);
 const oddTotal = computed(() => session.value?.oddOneOutQuestions?.length ?? 0);
 const oddCorrect = computed(() => session.value?.oddOneOutQuestions?.filter((q) => q.isCorrect).length ?? 0);
 const visualDuration = computed(() => {

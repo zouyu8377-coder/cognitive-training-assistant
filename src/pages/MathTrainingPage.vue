@@ -1,7 +1,7 @@
 <template>
   <PageContainer>
     <ProgressHeader :title="`数学练习 ${currentIndex + 1}/${questions.length}`" label="慢慢来" />
-    <section class="math stack">
+    <section class="math">
       <div class="question">{{ current.expression }}</div>
       <div class="answer">{{ answer || ' ' }}</div>
       <LargeNumberPad @press="append" @clear="answer = ''" @backspace="backspace" />
@@ -88,27 +88,35 @@ function skip() {
 </script>
 
 <style scoped>
+.math {
+  min-height: calc(100svh - 116px);
+  display: grid;
+  grid-template-rows: minmax(86px, 0.85fr) auto auto minmax(28px, auto) auto;
+  gap: 12px;
+}
+
 .question {
-  min-height: 120px;
+  min-height: 86px;
   display: grid;
   place-items: center;
   border-radius: 8px;
   background: #ffffff;
-  font-size: 3.4rem;
+  font-size: clamp(2.45rem, 12vw, 3.4rem);
   font-weight: 900;
 }
 
 .answer {
-  min-height: 70px;
+  min-height: 56px;
   display: grid;
   place-items: center;
   border-bottom: 3px solid #8fb1a2;
-  font-size: 2.4rem;
+  font-size: clamp(2rem, 8vw, 2.4rem);
   font-weight: 900;
 }
 
 .soft {
   min-height: 28px;
+  margin: 0;
   color: #5b6b66;
 }
 
@@ -116,5 +124,24 @@ function skip() {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  position: sticky;
+  bottom: 10px;
+  padding-top: 2px;
+  background: #f7f5ef;
+}
+
+@media (max-height: 700px) {
+  .math {
+    min-height: calc(100svh - 96px);
+    gap: 8px;
+  }
+
+  .question {
+    min-height: 72px;
+  }
+
+  .answer {
+    min-height: 48px;
+  }
 }
 </style>

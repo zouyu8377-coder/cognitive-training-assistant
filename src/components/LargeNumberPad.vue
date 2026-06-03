@@ -23,16 +23,16 @@ const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 .pad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 
 button {
-  min-height: 64px;
+  min-height: clamp(48px, 8.5svh, 64px);
   border: 1px solid #cad8d1;
   border-radius: 8px;
   background: #ffffff;
   color: #213633;
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 4.6vw, 1.3rem);
   font-weight: 800;
 }
 </style>

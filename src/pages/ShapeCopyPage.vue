@@ -7,7 +7,7 @@
         <LineArt :kind="task.shapeKind" :label="task.shapeName" />
       </ResultCard>
 
-      <DrawingCanvas ref="canvas" @redraw="redrawCount += 1" />
+      <DrawingCanvas ref="canvas" inactive-label="绘图区" active-label="正在绘画" @redraw="redrawCount += 1" />
       <p class="hint">{{ message }}</p>
 
       <ResultCard v-if="latestAttempt">
@@ -126,6 +126,7 @@ h2 {
 }
 
 .hint {
+  margin: 0;
   color: #52615d;
 }
 
@@ -133,5 +134,8 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  position: sticky;
+  bottom: 10px;
+  background: #f7f5ef;
 }
 </style>

@@ -1,17 +1,21 @@
 <template>
   <PageContainer>
-    <section class="hero stack">
-      <p class="kicker">公益家庭辅助工具</p>
+    <section class="hero">
       <h1>居家认知训练助手</h1>
-      <p class="lead">帮助家属准备简单练习，记录每日完成情况。</p>
-      <div class="notice">
-        本工具仅用于家庭日常认知活动辅助和训练记录，不提供医学诊断、疾病分期、治疗建议、用药建议或紧急救助服务。训练内容不能替代医生或专业人员评估。若患者出现明显异常、症状加重或紧急情况，请及时联系医疗机构。
+      <p class="lead">今天一起做几个轻松的小练习。</p>
+      <AppButton class="start-button" block @click="startPractice">开始练习</AppButton>
+
+      <div class="secondary-actions">
+        <AppButton v-if="store.state.currentSession" tone="secondary" block @click="continueDraft">
+          继续练习
+        </AppButton>
+        <RouterLink to="/setup"><AppButton tone="quiet" block>设置练习</AppButton></RouterLink>
+        <RouterLink to="/history"><AppButton tone="quiet" block>历史记录</AppButton></RouterLink>
       </div>
-      <AppButton v-if="store.state.currentSession" tone="secondary" block @click="continueDraft">
-        继续未完成训练
-      </AppButton>
-      <RouterLink to="/setup"><AppButton block>开始设置训练</AppButton></RouterLink>
-      <RouterLink to="/history"><AppButton tone="secondary" block>查看历史记录</AppButton></RouterLink>
+
+      <p class="notice compact">
+        本工具仅用于家庭日常认知活动辅助和训练记录，不提供医学诊断、治疗建议或紧急救助服务。
+      </p>
     </section>
   </PageContainer>
 </template>
@@ -21,10 +25,18 @@ import { useRouter } from 'vue-router';
 import AppButton from '../components/AppButton.vue';
 import PageContainer from '../components/PageContainer.vue';
 import { useTrainingStore } from '../stores/trainingStore';
+import { defaultSettings } from '../utils/storage';
 import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
+
+function startPractice() {
+  store.updateSettings(defaultSettings);
+  store.discardCurrentSession();
+  store.startTodaySession('steady');
+  router.push('/math');
+}
 
 function continueDraft() {
   if (!store.state.currentSession) return;
@@ -34,18 +46,15 @@ function continueDraft() {
 
 <style scoped>
 .hero {
-  padding-top: 18px;
-}
-
-.kicker {
-  margin: 0;
-  color: #58746c;
-  font-weight: 800;
+  min-height: calc(100svh - 56px);
+  display: grid;
+  align-content: center;
+  gap: 18px;
 }
 
 h1 {
   margin: 0;
-  font-size: 2.2rem;
+  font-size: clamp(2rem, 8vw, 2.6rem);
   line-height: 1.18;
 }
 
@@ -53,5 +62,26 @@ h1 {
   margin: 0;
   font-size: 1.15rem;
   color: #52615d;
+}
+
+.start-button {
+  min-height: 58px;
+  font-size: 1.2rem;
+}
+
+.secondary-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.secondary-actions > :first-child {
+  grid-column: 1 / -1;
+}
+
+.compact {
+  margin: 0;
+  padding: 12px;
+  font-size: 0.92rem;
 }
 </style>

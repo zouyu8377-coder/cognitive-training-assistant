@@ -7,7 +7,7 @@
         <ul>
           <li>数学练习：{{ store.state.settings.mathQuestionCount }} 题</li>
           <li>数字顺序练习：1-{{ store.state.settings.numberConnectLevel }}</li>
-          <li>看图说名称：3 题</li>
+          <li>看图写名称：4 题</li>
           <li>照着画图形：1 题</li>
           <li>找不同：3 题</li>
           <li v-if="store.state.settings.includeWritingTask">写名字</li>
@@ -39,6 +39,13 @@
         继续未完成训练
       </AppButton>
       <AppButton block @click="start">开始新的训练</AppButton>
+      <div v-if="confirmStartNew" class="inline-confirm">
+        <p>开始新的训练会放弃上次未完成进度。</p>
+        <div>
+          <AppButton tone="quiet" @click="confirmStartNew = false">取消</AppButton>
+          <AppButton @click="startConfirmed">仍然开始</AppButton>
+        </div>
+      </div>
       <RouterLink to="/setup"><AppButton tone="quiet" block>调整设置</AppButton></RouterLink>
     </section>
   </PageContainer>
@@ -61,6 +68,7 @@ import { nextTaskRoute } from '../utils/trainingFlow';
 const router = useRouter();
 const store = useTrainingStore();
 const preStatus = ref<PreTrainingStatus>('steady');
+const confirmStartNew = ref(false);
 const todaySessions = loadSessions().filter((session) => session.date === todayKey());
 const statusOptions = (Object.keys(preTrainingStatusText) as PreTrainingStatus[]).map((value) => ({
   value,
@@ -68,6 +76,15 @@ const statusOptions = (Object.keys(preTrainingStatusText) as PreTrainingStatus[]
 }));
 
 function start() {
+  if (store.state.currentSession) {
+    confirmStartNew.value = true;
+    return;
+  }
+  startConfirmed();
+}
+
+function startConfirmed() {
+  confirmStartNew.value = false;
   store.discardCurrentSession();
   store.startTodaySession(preStatus.value);
   router.push('/math');
@@ -99,8 +116,8 @@ li {
   display: grid;
   grid-template-columns: 28px 1fr;
   align-items: center;
-  min-height: 52px;
-  padding: 10px;
+  min-height: 48px;
+  padding: 8px 10px;
   border: 1px solid #d3ded7;
   border-radius: 8px;
   background: #ffffff;
@@ -115,5 +132,25 @@ li {
 .small {
   margin-top: 12px;
   font-size: 0.96rem;
+}
+
+.inline-confirm {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d8e1db;
+  border-radius: 8px;
+  background: #fffdf7;
+}
+
+.inline-confirm p {
+  margin: 0;
+  color: #52615d;
+}
+
+.inline-confirm div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 </style>
