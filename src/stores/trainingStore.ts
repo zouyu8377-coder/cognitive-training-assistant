@@ -117,8 +117,10 @@ export function useTrainingStore() {
     persistDraft();
   }
 
-  function setWritingStatus(status: TrainingSession['writingStatus']) {
-    ensureSession().writingStatus = status;
+  function setWritingStatus(status: TrainingSession['writingStatus'], writingDataUrl?: string) {
+    const session = ensureSession();
+    session.writingStatus = status;
+    session.writingDataUrl = writingDataUrl;
     persistDraft();
   }
 

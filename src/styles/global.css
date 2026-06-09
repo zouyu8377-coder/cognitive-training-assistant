@@ -57,3 +57,13 @@ a {
     padding: 16px;
   }
 }
+
+@media (max-width: 520px) {
+  :root {
+    font-size: 16px;
+  }
+
+  .stack {
+    gap: 8px;
+  }
+}

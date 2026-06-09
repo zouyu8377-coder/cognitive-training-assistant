@@ -11,4 +11,10 @@
   margin: 0 auto;
   padding: 24px 18px 32px;
 }
+
+@media (max-width: 520px) {
+  .page-shell {
+    padding: 10px 12px 12px;
+  }
+}
 </style>

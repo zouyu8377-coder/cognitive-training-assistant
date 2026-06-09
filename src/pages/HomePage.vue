@@ -25,14 +25,12 @@ import { useRouter } from 'vue-router';
 import AppButton from '../components/AppButton.vue';
 import PageContainer from '../components/PageContainer.vue';
 import { useTrainingStore } from '../stores/trainingStore';
-import { defaultSettings } from '../utils/storage';
 import { nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
 const store = useTrainingStore();
 
 function startPractice() {
-  store.updateSettings(defaultSettings);
   store.discardCurrentSession();
   store.startTodaySession('steady');
   router.push('/math');

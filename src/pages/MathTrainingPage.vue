@@ -130,9 +130,9 @@ function skip() {
   background: #f7f5ef;
 }
 
-@media (max-height: 700px) {
+@media (max-width: 520px) {
   .math {
-    min-height: calc(100svh - 96px);
+    min-height: calc(100svh - 72px);
     gap: 8px;
   }
 
@@ -142,6 +142,10 @@ function skip() {
 
   .answer {
     min-height: 48px;
+  }
+
+  .actions {
+    bottom: 4px;
   }
 }
 </style>

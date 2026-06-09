@@ -45,4 +45,25 @@ p {
 strong {
   font-size: 1.35rem;
 }
+
+@media (max-width: 520px) {
+  .progress-header {
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .back {
+    min-width: 58px;
+    min-height: 36px;
+  }
+
+  p {
+    margin-bottom: 2px;
+    font-size: 0.82rem;
+  }
+
+  strong {
+    font-size: 1.08rem;
+  }
+}
 </style>

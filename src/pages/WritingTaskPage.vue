@@ -37,7 +37,8 @@ function clearCanvas() {
 
 function choose(status: TrainingSession['writingStatus']) {
   const session = store.ensureSession();
-  store.setWritingStatus(status);
+  const writingDataUrl = status === 'completed' && hasWriting.value ? canvas.value?.snapshot() : undefined;
+  store.setWritingStatus(status, writingDataUrl);
   router.push(nextTaskRoute(store.state.settings, session));
 }
 </script>
@@ -58,5 +59,21 @@ p {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+@media (max-width: 520px) {
+  .task {
+    min-height: calc(100svh - 72px);
+    gap: 8px;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .writing-actions {
+    gap: 6px;
+  }
 }
 </style>

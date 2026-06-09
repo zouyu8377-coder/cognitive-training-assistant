@@ -185,4 +185,26 @@ canvas {
   font-size: 0.9rem;
   line-height: 1.45;
 }
+
+@media (max-width: 520px) {
+  .draw-toolbar {
+    min-height: 34px;
+    padding: 4px 8px 4px 10px;
+  }
+
+  .draw-toggle {
+    min-width: 58px;
+    min-height: 32px;
+  }
+
+  canvas {
+    height: 118px;
+  }
+
+  .draw-hint {
+    padding: 5px 8px 6px;
+    font-size: 0.76rem;
+    line-height: 1.3;
+  }
+}
 </style>

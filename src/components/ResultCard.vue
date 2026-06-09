@@ -11,4 +11,10 @@
   border-radius: 8px;
   background: #fffdf7;
 }
+
+@media (max-width: 520px) {
+  .result-card {
+    padding: 8px;
+  }
+}
 </style>

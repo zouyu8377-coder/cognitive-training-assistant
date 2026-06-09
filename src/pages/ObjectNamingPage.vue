@@ -10,8 +10,8 @@
       <div class="primary-actions">
         <AppButton tone="quiet" :disabled="waiting" @click="rewrite">重写</AppButton>
         <AppButton :disabled="waiting" @click="submitHandwriting">手写完成</AppButton>
+        <AppButton tone="quiet" :disabled="waiting" @click="skip">先跳过</AppButton>
       </div>
-      <AppButton tone="quiet" :disabled="waiting" block @click="skip">先跳过</AppButton>
     </section>
   </PageContainer>
 </template>
@@ -102,5 +102,18 @@ function skip() {
   position: sticky;
   bottom: 10px;
   background: #f7f5ef;
+}
+
+@media (max-width: 520px) {
+  .primary-actions {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    bottom: 4px;
+  }
+
+  .hint {
+    min-height: 20px;
+    font-size: 0.86rem;
+  }
 }
 </style>

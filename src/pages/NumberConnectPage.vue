@@ -144,11 +144,15 @@ function tap(value: number) {
   background: #f7f5ef;
 }
 
-@media (max-height: 700px) {
+@media (max-width: 520px) {
   .number-task {
-    min-height: calc(100svh - 96px);
+    min-height: calc(100svh - 72px);
     grid-template-rows: minmax(260px, 1fr) minmax(28px, auto) auto;
     gap: 8px;
+  }
+
+  .actions {
+    bottom: 4px;
   }
 }
 </style>

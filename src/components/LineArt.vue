@@ -78,4 +78,14 @@ const isImage = computed(() => /\.(jpe?g|png|webp|gif|svg)$/i.test(props.kind));
   margin: 0 auto;
   object-fit: contain;
 }
+
+@media (max-width: 520px) {
+  .line-art {
+    max-width: 170px;
+  }
+
+  .object-image {
+    max-height: 108px;
+  }
+}
 </style>

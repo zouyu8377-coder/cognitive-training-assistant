@@ -63,4 +63,12 @@ withDefaults(
     font-size: 0.94rem;
   }
 }
+
+@media (max-width: 520px) {
+  .app-button {
+    min-height: 36px;
+    padding: 6px 8px;
+    font-size: 0.88rem;
+  }
+}
 </style>

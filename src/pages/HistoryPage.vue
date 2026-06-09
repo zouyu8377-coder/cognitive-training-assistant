@@ -7,24 +7,22 @@
         <input v-model="selectedDate" type="date" />
       </label>
 
-      <ResultCard v-if="selectedSession">
-        <RouterLink class="record" :to="`/result/${selectedSession.id}`">
-          <strong>{{ selectedSession.date }}</strong>
-          <span>{{ selectedSession.completedAt ? '已完成' : '未完成' }}</span>
-          <span>数学正确：{{ correctCount(selectedSession) }} / {{ selectedSession.mathQuestions.length }}</span>
-          <span>数字顺序：{{ selectedSession.numberConnectResult?.completed ? '已完成' : '未完成' }}</span>
-          <span>状态：{{ moodText(selectedSession.patientMood) }}</span>
+      <ResultCard v-for="item in selectedDateSessions" :key="item.id">
+        <RouterLink class="record" :to="`/result/${item.id}`">
+          <strong>{{ item.date }}</strong>
+          <span>时间：{{ sessionTimeText(item) }}</span>
+          <span>{{ item.completedAt ? '已完成' : '未完成' }}</span>
+          <span>数学正确：{{ correctCount(item) }} / {{ item.mathQuestions.length }}</span>
+          <span>数字顺序：{{ item.numberConnectResult?.completed ? '已完成' : '未完成' }}</span>
+          <span>状态：{{ moodText(item.patientMood) }}</span>
         </RouterLink>
       </ResultCard>
-      <p v-else class="muted">这一天还没有保存的训练记录。</p>
-
-      <RouterLink v-if="selectedSession" :to="`/result/${selectedSession.id}`">
-        <AppButton block>查看当天结果</AppButton>
-      </RouterLink>
+      <p v-if="selectedDateSessions.length === 0" class="muted">这一天还没有保存的训练记录。</p>
 
       <ResultCard v-for="item in recentSessions" :key="item.id">
         <RouterLink class="record" :to="`/result/${item.id}`">
           <strong>{{ item.date }}</strong>
+          <span>时间：{{ sessionTimeText(item) }}</span>
           <span>{{ item.completedAt ? '已完成' : '未完成' }}</span>
           <span>数学正确：{{ correctCount(item) }} / {{ item.mathQuestions.length }}</span>
           <span>数字顺序：{{ item.numberConnectResult?.completed ? '已完成' : '未完成' }}</span>
@@ -50,11 +48,18 @@ import { loadSessions } from '../utils/storage';
 
 const sessions = loadSessions().sort((a, b) => b.date.localeCompare(a.date));
 const selectedDate = ref(sessions[0]?.date ?? todayKey());
-const selectedSession = computed(() => sessions.find((session) => session.date === selectedDate.value));
+const selectedDateSessions = computed(() => sessions.filter((session) => session.date === selectedDate.value));
 const recentSessions = computed(() => sessions.filter((session) => session.date !== selectedDate.value).slice(0, 6));
 
 function correctCount(item: TrainingSession) {
   return item.mathQuestions.filter((question) => question.isCorrect).length;
+}
+
+function sessionTimeText(item: TrainingSession): string {
+  return new Date(item.completedAt ?? item.startedAt).toLocaleTimeString('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 function moodText(mood?: PatientMood) {

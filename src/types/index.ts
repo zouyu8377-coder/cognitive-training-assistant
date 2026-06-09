@@ -51,6 +51,7 @@ export interface ShapeCopyTask {
   id: string;
   shapeName: string;
   shapeKind: ShapeType;
+  referenceImageUrl?: string;
   completed?: boolean;
   skipped?: boolean;
   redrawCount: number;
@@ -121,6 +122,7 @@ export interface TrainingSession {
   shapeCopyTask?: ShapeCopyTask;
   oddOneOutQuestions?: OddOneOutQuestion[];
   writingStatus?: 'completed' | 'skipped' | 'help_needed';
+  writingDataUrl?: string;
   singingStatus?: 'completed_good' | 'completed_tired' | 'skipped' | 'not_done';
   patientMood?: PatientMood;
   caregiverNote?: string;

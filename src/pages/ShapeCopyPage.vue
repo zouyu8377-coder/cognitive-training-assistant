@@ -3,8 +3,8 @@
     <ProgressHeader title="照着画图形" label="看一看，画一画" />
     <section class="stack">
       <ResultCard>
-        <h2>请照着画一个{{ task.shapeName }}</h2>
-        <LineArt :kind="task.shapeKind" :label="task.shapeName" />
+        <h2>{{ task.referenceImageUrl ? '请照着图片画一遍' : `请照着画一个${task.shapeName}` }}</h2>
+        <LineArt :kind="task.referenceImageUrl ?? task.shapeKind" :label="task.shapeName" />
       </ResultCard>
 
       <DrawingCanvas ref="canvas" inactive-label="绘图区" active-label="正在绘画" @redraw="redrawCount += 1" />
@@ -19,10 +19,12 @@
       <div v-if="!latestAttempt" class="primary-actions">
         <AppButton tone="quiet" block @click="clearCanvas">清空重画</AppButton>
         <AppButton block @click="completeAttempt">完成</AppButton>
+        <AppButton tone="secondary" block @click="skip">先不画</AppButton>
       </div>
-      <AppButton v-if="latestAttempt" tone="quiet" block @click="clearCanvas">清空重画</AppButton>
-      <AppButton v-if="latestAttempt" block @click="saveAndContinue">保存并继续</AppButton>
-      <AppButton v-if="!latestAttempt" tone="secondary" block @click="skip">今天先不画</AppButton>
+      <div v-if="latestAttempt" class="primary-actions">
+        <AppButton tone="quiet" block @click="clearCanvas">清空重画</AppButton>
+        <AppButton block @click="saveAndContinue">保存并继续</AppButton>
+      </div>
     </section>
   </PageContainer>
 </template>
@@ -137,5 +139,22 @@ h2 {
   position: sticky;
   bottom: 10px;
   background: #f7f5ef;
+}
+
+@media (max-width: 520px) {
+  h2 {
+    margin-bottom: 6px;
+    font-size: 1rem;
+  }
+
+  .hint {
+    font-size: 0.86rem;
+  }
+
+  .primary-actions {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    bottom: 4px;
+  }
 }
 </style>

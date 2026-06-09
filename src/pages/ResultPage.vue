@@ -17,6 +17,7 @@
         <p>照着画图形：{{ shapeCopyText }}</p>
         <p>找不同：{{ oddCorrect }} / {{ oddTotal }}</p>
         <p>写名字：{{ writingText }}</p>
+        <img v-if="session.writingDataUrl" class="drawing-preview" :src="session.writingDataUrl" alt="手写名字记录" />
         <p>跟唱：{{ singingText }}</p>
         <p>本次总耗时：{{ formatDuration(totalDuration) }}</p>
       </ResultCard>
