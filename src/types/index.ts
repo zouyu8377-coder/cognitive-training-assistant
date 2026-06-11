@@ -8,6 +8,7 @@ export type NumberConnectOrder = 'ascending' | 'descending';
 
 export interface TrainingSettings {
   patientNickname: string;
+  cloudTrackingConsent: boolean;
   mathQuestionCount: 5 | 10 | 15 | 20;
   mathLevel: MathLevel;
   includeSubtraction: boolean;

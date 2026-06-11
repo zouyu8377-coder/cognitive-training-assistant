@@ -55,3 +55,8 @@ https://<github-user>.github.io/cognitive-training-assistant/
 - `src/utils/storage.ts`：localStorage 读写。
 - `docs/product-scope.md`：当前产品范围。
 - `docs/future-roadmap.md`：后续路线图。
+
+## 云端试用记录
+
+匿名试用用户、活动日志、管理员查看和 GitHub Pages 环境变量的配置步骤见
+[`docs/cloud-tracking-setup.md`](docs/cloud-tracking-setup.md)。

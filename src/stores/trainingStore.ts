@@ -24,6 +24,7 @@ import {
 } from '../utils/storage';
 import { generateMathQuestions } from '../utils/mathGenerator';
 import { generateObjectNamingQuestions, generateOddOneOutQuestions, generateShapeCopyTask } from '../utils/visualTraining';
+import { syncTrainingSession, trackActivity } from '../services/cloudTracking';
 
 interface TrainingState {
   settings: TrainingSettings;
@@ -49,6 +50,13 @@ export function useTrainingStore() {
   function updateSettings(settings: TrainingSettings) {
     state.settings = { ...settings };
     saveSettings(state.settings);
+    if (state.settings.cloudTrackingConsent) {
+      void trackActivity('settings_saved', state.settings.patientNickname, undefined, {
+        mathLevel: state.settings.mathLevel,
+        mathQuestionCount: state.settings.mathQuestionCount,
+        numberConnectLevel: state.settings.numberConnectLevel,
+      });
+    }
   }
 
   function startTodaySession(preTrainingStatus: PreTrainingStatus = 'steady') {
@@ -70,6 +78,10 @@ export function useTrainingStore() {
       oddOneOutQuestions: generateOddOneOutQuestions(),
     };
     persistDraft();
+    void syncTrainingSession(state.currentSession);
+    void trackActivity('training_started', state.currentSession.patientNickname, state.currentSession, {
+      preTrainingStatus,
+    });
   }
 
   function ensureSession() {
@@ -140,6 +152,8 @@ export function useTrainingStore() {
     const session = state.currentSession;
     session.completedAt = session.completedAt ?? new Date().toISOString();
     saveSession(JSON.parse(JSON.stringify(session)) as TrainingSession);
+    void syncTrainingSession(session);
+    void trackActivity('training_completed', session.patientNickname, session);
     clearDraftSession();
     state.currentSession = undefined;
   }
@@ -150,16 +164,27 @@ export function useTrainingStore() {
     session.caregiverNote = caregiverNote;
     session.completedAt = session.completedAt ?? new Date().toISOString();
     saveSession(JSON.parse(JSON.stringify(session)) as TrainingSession);
+    void syncTrainingSession(session);
+    void trackActivity('caregiver_note_saved', session.patientNickname, session, {
+      patientMood,
+      hasNote: Boolean(caregiverNote.trim()),
+    });
     clearDraftSession();
     state.currentSession = undefined;
   }
 
   function saveExistingResult(session: TrainingSession, patientMood: PatientMood, caregiverNote: string) {
-    updateSession({
+    const updatedSession = {
       ...session,
       patientMood,
       caregiverNote,
       completedAt: session.completedAt ?? new Date().toISOString(),
+    };
+    updateSession(updatedSession);
+    void syncTrainingSession(updatedSession);
+    void trackActivity('caregiver_note_saved', updatedSession.patientNickname, updatedSession, {
+      patientMood,
+      hasNote: Boolean(caregiverNote.trim()),
     });
   }
 

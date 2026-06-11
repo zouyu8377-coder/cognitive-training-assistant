@@ -12,6 +12,8 @@ import SingingTaskPage from '../pages/SingingTaskPage.vue';
 import CompletePage from '../pages/CompletePage.vue';
 import ResultPage from '../pages/ResultPage.vue';
 import HistoryPage from '../pages/HistoryPage.vue';
+import AdminLoginPage from '../pages/AdminLoginPage.vue';
+import AdminDashboardPage from '../pages/AdminDashboardPage.vue';
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -29,6 +31,8 @@ const router = createRouter({
     { path: '/complete', component: CompletePage },
     { path: '/result/:id?', component: ResultPage },
     { path: '/history', component: HistoryPage },
+    { path: '/admin/login', component: AdminLoginPage },
+    { path: '/admin', component: AdminDashboardPage },
   ],
 });
 

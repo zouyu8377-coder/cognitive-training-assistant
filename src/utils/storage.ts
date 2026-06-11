@@ -6,6 +6,7 @@ const DRAFT_SESSION_KEY = 'cta-draft-session';
 
 export const defaultSettings: TrainingSettings = {
   patientNickname: '家人',
+  cloudTrackingConsent: false,
   mathQuestionCount: 10,
   mathLevel: 'L4',
   includeSubtraction: true,

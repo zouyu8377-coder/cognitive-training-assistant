@@ -42,8 +42,15 @@
         <input v-model="form.includeSingingTask" type="checkbox" />
         包含跟唱记录任务
       </label>
+      <label class="check consent">
+        <input v-model="form.cloudTrackingConsent" type="checkbox" />
+        <span>允许上传患者昵称、练习过程和完成情况，供项目管理员了解试用情况</span>
+      </label>
       <p class="muted">默认设置偏低压力，优先帮助完成和保持参与意愿。</p>
       <AppButton type="submit" block>保存并查看今日训练</AppButton>
+      <p class="privacy-note">
+        启用云端记录后，患者昵称、练习过程和完成情况会安全上传，供本项目管理员了解试用情况。
+      </p>
     </form>
   </PageContainer>
 </template>
@@ -94,5 +101,21 @@ select {
 
 .check input {
   min-height: 28px;
+}
+
+.privacy-note {
+  margin: 0;
+  color: #64706c;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.consent {
+  padding: 12px;
+  border: 1px solid #d3ded7;
+  border-radius: 8px;
+  background: #ffffff;
+  font-weight: 700;
+  line-height: 1.5;
 }
 </style>
