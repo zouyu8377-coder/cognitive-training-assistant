@@ -23,7 +23,12 @@ import {
   updateSession,
 } from '../utils/storage';
 import { generateMathQuestions } from '../utils/mathGenerator';
-import { generateObjectNamingQuestions, generateOddOneOutQuestions, generateShapeCopyTask } from '../utils/visualTraining';
+import {
+  generateObjectNamingQuestions,
+  generateOddOneOutQuestions,
+  generateShapeCopyTask,
+  normalizeVisualAssetUrls,
+} from '../utils/visualTraining';
 import { syncTrainingSession, trackActivity } from '../services/cloudTracking';
 
 interface TrainingState {
@@ -45,6 +50,7 @@ export function useTrainingStore() {
     if (!session.objectNamingQuestions?.length) session.objectNamingQuestions = generateObjectNamingQuestions();
     if (!session.shapeCopyTask) session.shapeCopyTask = generateShapeCopyTask();
     if (!session.oddOneOutQuestions?.length) session.oddOneOutQuestions = generateOddOneOutQuestions();
+    normalizeVisualAssetUrls(session);
   }
 
   function updateSettings(settings: TrainingSettings) {
