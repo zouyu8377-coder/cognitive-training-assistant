@@ -51,7 +51,10 @@
       </section>
 
       <section class="table-section">
-        <h2>练习记录</h2>
+        <div class="section-heading">
+          <h2>练习记录</h2>
+          <span>云端仅保留最近 100 条</span>
+        </div>
         <div class="table-scroll">
           <table>
             <thead>
@@ -62,6 +65,7 @@
                 <th>数学正确</th>
                 <th>开始时间</th>
                 <th>完成时间</th>
+                <th>详情</th>
               </tr>
             </thead>
             <tbody>
@@ -72,9 +76,14 @@
                 <td>{{ mathCorrect(session) }} / {{ session.result_data.mathQuestions.length }}</td>
                 <td>{{ dateTime(session.started_at) }}</td>
                 <td>{{ session.completed_at ? dateTime(session.completed_at) : '未完成' }}</td>
+                <td>
+                  <RouterLink class="detail-link" :to="`/admin/session/${encodeURIComponent(session.id)}`">
+                    查看详情
+                  </RouterLink>
+                </td>
               </tr>
               <tr v-if="filteredSessions.length === 0">
-                <td colspan="6" class="empty">暂无符合条件的练习记录</td>
+                <td colspan="7" class="empty">暂无符合条件的练习记录</td>
               </tr>
             </tbody>
           </table>
@@ -303,6 +312,24 @@ function eventName(type: string) {
 .table-section h2 {
   margin: 0 0 10px;
   font-size: 1.12rem;
+}
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-heading span {
+  color: #64706c;
+  font-size: 0.82rem;
+}
+
+.detail-link {
+  color: #206a56;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .table-scroll {

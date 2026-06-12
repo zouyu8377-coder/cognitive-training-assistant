@@ -31,7 +31,7 @@ export interface AdminTrainingSession {
   id: string;
   patient_id: string;
   started_at: string;
-  completed_at?: string;
+  completed_at?: string | null;
   session_date: string;
   status: 'started' | 'completed';
   result_data: TrainingSession;
@@ -41,7 +41,7 @@ export interface AdminTrainingSession {
 export interface AdminActivityEvent {
   id: string;
   patient_id: string;
-  session_id?: string;
+  session_id?: string | null;
   event_type: string;
   event_data: Record<string, unknown>;
   occurred_at: string;
@@ -259,7 +259,7 @@ export async function loadAdminDashboard(): Promise<{
       .from('training_sessions')
       .select('id,patient_id,started_at,completed_at,session_date,status,result_data,updated_at')
       .order('started_at', { ascending: false })
-      .limit(200),
+      .limit(100),
     supabase
       .from('activity_events')
       .select('id,patient_id,session_id,event_type,event_data,occurred_at')
@@ -274,4 +274,16 @@ export async function loadAdminDashboard(): Promise<{
     sessions: (sessionsResult.data ?? []) as AdminTrainingSession[],
     events: (eventsResult.data ?? []) as AdminActivityEvent[],
   };
+}
+
+export async function loadAdminTrainingSession(id: string): Promise<AdminTrainingSession | undefined> {
+  if (!supabase) return undefined;
+  const { data, error } = await supabase
+    .from('training_sessions')
+    .select('id,patient_id,started_at,completed_at,session_date,status,result_data,updated_at')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as AdminTrainingSession | undefined;
 }
