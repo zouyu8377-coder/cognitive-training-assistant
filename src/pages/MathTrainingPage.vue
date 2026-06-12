@@ -3,7 +3,13 @@
     <ProgressHeader :title="`数学练习 ${currentIndex + 1}/${questions.length}`" label="慢慢来" />
     <section class="math">
       <div class="question">{{ current.expression }}</div>
-      <div class="answer">{{ answer || ' ' }}</div>
+      <div class="answer" :class="feedback">
+        <span>{{ answer || ' ' }}</span>
+        <div v-if="feedback" class="answer-feedback" role="status">
+          <strong>{{ feedback === 'correct' ? '✓' : '~' }}</strong>
+          <small>{{ feedback === 'correct' ? '答对啦！' : '差一点，下一题继续' }}</small>
+        </div>
+      </div>
       <LargeNumberPad @press="append" @clear="answer = ''" @backspace="backspace" />
       <p class="soft">{{ message }}</p>
       <div class="actions">
@@ -33,9 +39,11 @@ const answer = ref('');
 const startedAt = ref(Date.now());
 const message = ref('输入答案后点下一题。');
 const waiting = ref(false);
+const feedback = ref<'' | 'correct' | 'try-again'>('');
 const current = computed(() => questions[currentIndex.value]);
 
 function append(value: number) {
+  if (waiting.value) return;
   if (answer.value.length < 3) answer.value += String(value);
 }
 
@@ -63,6 +71,7 @@ function moveOn() {
   }
   currentIndex.value += 1;
   answer.value = '';
+  feedback.value = '';
   message.value = '继续下一题。';
   startedAt.value = Date.now();
 }
@@ -74,6 +83,7 @@ function next() {
   }
   const isCorrect = record(false);
   waiting.value = true;
+  feedback.value = isCorrect ? 'correct' : 'try-again';
   message.value = isCorrect ? '答对啦，很好。' : '已经认真尝试了，继续保持。';
   window.setTimeout(() => {
     waiting.value = false;
@@ -112,6 +122,49 @@ function skip() {
   border-bottom: 3px solid #8fb1a2;
   font-size: clamp(2rem, 8vw, 2.4rem);
   font-weight: 900;
+}
+
+.answer.correct,
+.answer.try-again {
+  grid-template-columns: minmax(70px, 1fr) auto;
+  padding: 5px 10px 5px 18px;
+}
+
+.answer.correct {
+  border-color: #45a66b;
+  background: #eaf7ed;
+}
+
+.answer.try-again {
+  border-color: #e1a43a;
+  background: #fff5dc;
+}
+
+.answer-feedback {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 3px 8px;
+  color: #256b47;
+}
+
+.answer-feedback strong {
+  grid-row: 1 / 3;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  font-size: 1.5rem;
+}
+
+.answer-feedback small {
+  font-weight: 800;
+}
+
+.answer.try-again .answer-feedback {
+  color: #9a6818;
 }
 
 .soft {

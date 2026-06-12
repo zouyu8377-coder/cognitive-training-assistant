@@ -1,29 +1,24 @@
 <template>
-  <PageContainer>
-    <ProgressHeader title="照着画图形" label="看一看，画一画" />
-    <section class="stack">
-      <ResultCard>
+  <PageContainer class="drawing-page">
+    <ProgressHeader title="照着画图形" label="看一看，画一画">
+      <template #action>
+        <button type="button" @click="skip">跳过</button>
+      </template>
+    </ProgressHeader>
+
+    <section class="drawing-task">
+      <ResultCard class="reference-stage">
         <h2>{{ task.referenceImageUrl ? '请照着图片画一遍' : `请照着画一个${task.shapeName}` }}</h2>
         <LineArt :kind="task.referenceImageUrl ?? task.shapeKind" :label="task.shapeName" />
       </ResultCard>
 
-      <DrawingCanvas ref="canvas" inactive-label="绘图区" active-label="正在绘画" @redraw="redrawCount += 1" />
+      <DrawingCanvas ref="canvas" inactive-label="绘图区" active-label="请照着上方图形画" @redraw="redrawCount += 1" />
       <p class="hint">{{ message }}</p>
 
-      <ResultCard v-if="latestAttempt">
-        <h2>这次画完啦</h2>
-        <p>{{ latestAttempt.metrics.feedbackText }}</p>
-        <p class="muted">已经尝试 {{ attempts.length }} 次。{{ bestSavedMessage }}</p>
-      </ResultCard>
-
-      <div v-if="!latestAttempt" class="primary-actions">
-        <AppButton tone="quiet" block @click="clearCanvas">清空重画</AppButton>
-        <AppButton block @click="completeAttempt">完成</AppButton>
-        <AppButton tone="secondary" block @click="skip">先不画</AppButton>
-      </div>
-      <div v-if="latestAttempt" class="primary-actions">
-        <AppButton tone="quiet" block @click="clearCanvas">清空重画</AppButton>
-        <AppButton block @click="saveAndContinue">保存并继续</AppButton>
+      <div class="primary-actions">
+        <AppButton tone="quiet" block @click="clearCanvas">重画</AppButton>
+        <AppButton v-if="!latestAttempt" block @click="completeAttempt">画好了</AppButton>
+        <AppButton v-else block @click="saveAndContinue">完成并继续</AppButton>
       </div>
     </section>
   </PageContainer>
@@ -53,9 +48,6 @@ const attempts = ref<ShapeDrawingAttempt[]>(task.attempts ?? []);
 const latestAttempt = ref<ShapeDrawingAttempt>();
 const message = ref('请照着示例，在下面的方框里画一遍。');
 const bestAttempt = computed(() => bestShapeAttempt(attempts.value));
-const bestSavedMessage = computed(() =>
-  latestAttempt.value?.id === bestAttempt.value?.id ? '这次已经作为当前最好结果保存。' : '当前保留表现更好的一次。',
-);
 
 function persistDraft(selectedAttemptId?: string, completed = false, skipped = false) {
   const selected = attempts.value.find((attempt) => attempt.id === selectedAttemptId) ?? bestAttempt.value ?? latestAttempt.value;
@@ -80,7 +72,7 @@ function clearCanvas() {
 function completeAttempt() {
   const points = canvas.value?.getPoints() ?? [];
   if (points.length < 6) {
-    message.value = '可以先画几笔，再点完成。';
+    message.value = '可以先画几笔，再点画好了。';
     return;
   }
   const metrics = evaluateShapeDrawing(task.shapeKind, points);
@@ -94,14 +86,12 @@ function completeAttempt() {
   };
   latestAttempt.value = attempt;
   attempts.value = [attempt, ...attempts.value].slice(0, 3);
-  const selected = bestShapeAttempt(attempts.value);
-  persistDraft(selected?.id);
-  message.value = metrics.feedbackText;
+  persistDraft(bestShapeAttempt(attempts.value)?.id);
+  message.value = `${metrics.feedbackText} 可以重画，或完成并继续。`;
 }
 
 function saveAndContinue() {
   persistDraft(bestAttempt.value?.id, true, false);
-  message.value = '已保存本次练习。';
   router.push(nextTaskRoute(store.state.settings, session));
 }
 
@@ -116,45 +106,79 @@ function skip() {
     drawingDataUrl: bestAttempt.value?.imageDataUrl,
     durationSeconds: bestAttempt.value?.metrics.durationSeconds,
   });
-  message.value = '今天先放一放也可以。';
   router.push(nextTaskRoute(store.state.settings, session));
 }
 </script>
 
 <style scoped>
+.drawing-page {
+  height: 100svh;
+  overflow: hidden;
+}
+
+.drawing-task {
+  height: calc(100svh - 92px);
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(112px, 25svh) minmax(230px, 1fr) auto auto;
+  gap: 10px;
+}
+
+.reference-stage {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.reference-stage :deep(.object-image),
+.reference-stage :deep(.line-art) {
+  max-height: calc(100% - 28px);
+}
+
 h2 {
-  margin: 0 0 12px;
+  margin: 0;
   text-align: center;
 }
 
 .hint {
+  min-height: 24px;
   margin: 0;
   color: #52615d;
+  text-align: center;
 }
 
 .primary-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  position: sticky;
-  bottom: 10px;
+  padding-bottom: max(2px, env(safe-area-inset-bottom));
   background: #f7f5ef;
 }
 
+.primary-actions :deep(.app-button) {
+  min-height: 62px;
+  font-size: 1.12rem;
+}
+
 @media (max-width: 520px) {
+  .drawing-task {
+    height: calc(100svh - 72px);
+    grid-template-rows: minmax(96px, 21svh) minmax(0, 1fr) auto auto;
+    gap: 6px;
+  }
+
   h2 {
-    margin-bottom: 6px;
     font-size: 1rem;
   }
 
   .hint {
+    min-height: 18px;
     font-size: 0.86rem;
   }
 
   .primary-actions {
-    grid-template-columns: repeat(3, 1fr);
     gap: 6px;
-    bottom: 4px;
   }
 }
 </style>

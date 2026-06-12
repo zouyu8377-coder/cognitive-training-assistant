@@ -147,15 +147,16 @@ export function useTrainingStore() {
     persistDraft();
   }
 
-  function finishAndSaveSession() {
-    if (!state.currentSession) return;
+  async function finishAndSaveSession() {
+    if (!state.currentSession) return 'disabled' as const;
     const session = state.currentSession;
     session.completedAt = session.completedAt ?? new Date().toISOString();
     saveSession(JSON.parse(JSON.stringify(session)) as TrainingSession);
-    void syncTrainingSession(session);
-    void trackActivity('training_completed', session.patientNickname, session);
+    const syncResult = await syncTrainingSession(session);
+    await trackActivity('training_completed', session.patientNickname, session);
     clearDraftSession();
     state.currentSession = undefined;
+    return syncResult;
   }
 
   function saveCaregiverResult(patientMood: PatientMood, caregiverNote: string) {

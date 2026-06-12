@@ -1,16 +1,32 @@
 <template>
-  <PageContainer>
-    <ProgressHeader :title="`看图写名称 ${currentIndex + 1}/${questions.length}`" label="看一看，写一写" />
-    <section class="stack">
-      <ResultCard>
-        <LineArt :kind="current.icon" :label="current.name" />
+  <PageContainer class="drawing-page">
+    <ProgressHeader :title="`看图写名称 ${currentIndex + 1}/${questions.length}`" label="看一看，写一写">
+      <template #action>
+        <button type="button" :disabled="waiting || imageLoading" @click="skip">跳过</button>
+      </template>
+    </ProgressHeader>
+
+    <section class="drawing-task">
+      <ResultCard class="image-stage">
+        <div v-if="imageLoading" class="image-loading" role="status">
+          <span class="spinner"></span>
+          <strong>正在加载下一张图...</strong>
+        </div>
+        <LineArt
+          :key="current.id"
+          :class="{ 'image-hidden': imageLoading }"
+          :kind="current.icon"
+          :label="current.name"
+          @load="imageReady"
+          @error="imageFailed"
+        />
       </ResultCard>
-      <DrawingCanvas ref="canvas" inactive-label="手写区" active-label="正在手写" @draw="hasDrawing = true" />
+
+      <DrawingCanvas ref="canvas" inactive-label="手写区" active-label="请写下图片名称" @draw="hasDrawing = true" />
       <p class="hint">{{ message }}</p>
       <div class="primary-actions">
         <AppButton tone="quiet" :disabled="waiting" @click="rewrite">重写</AppButton>
         <AppButton :disabled="waiting" @click="submitHandwriting">手写完成</AppButton>
-        <AppButton tone="quiet" :disabled="waiting" @click="skip">先跳过</AppButton>
       </div>
     </section>
   </PageContainer>
@@ -35,8 +51,9 @@ const questions = session.objectNamingQuestions ?? [];
 const currentIndex = ref(firstPendingObjectIndex(session));
 const canvas = ref<InstanceType<typeof DrawingCanvas>>();
 const hasDrawing = ref(false);
-const message = ref('可以在空白区手写名称，写好后点手写完成。');
+const message = ref('正在加载图片...');
 const waiting = ref(false);
+const imageLoading = ref(true);
 const startedAt = ref(Date.now());
 const current = computed(() => questions[currentIndex.value]);
 
@@ -57,17 +74,22 @@ function moveOn() {
     router.push(nextTaskRoute(store.state.settings, session));
     return;
   }
+  imageLoading.value = true;
+  message.value = '正在加载下一张图...';
   currentIndex.value += 1;
   hasDrawing.value = false;
   canvas.value?.clear(false);
-  message.value = '继续下一张图。';
   startedAt.value = Date.now();
 }
 
 function submitHandwriting() {
+  if (!hasDrawing.value) {
+    message.value = '请先写几笔，也可以点右上角跳过。';
+    return;
+  }
   recordHandwriting(false);
   waiting.value = true;
-  message.value = '写好啦，家属稍后可以查看。';
+  message.value = '写好啦，正在准备下一题。';
   window.setTimeout(() => {
     waiting.value = false;
     moveOn();
@@ -82,37 +104,111 @@ function rewrite() {
 
 function skip() {
   recordHandwriting(true);
-  message.value = '先放一放也可以。';
   moveOn();
 }
 
+function imageReady() {
+  imageLoading.value = false;
+  message.value = '请在下方写出图片名称。';
+}
+
+function imageFailed() {
+  imageLoading.value = false;
+  message.value = '图片暂时没有加载出来，可以点右上角跳过。';
+}
 </script>
 
 <style scoped>
+.drawing-page {
+  height: 100svh;
+  overflow: hidden;
+}
+
+.drawing-task {
+  height: calc(100svh - 92px);
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(100px, 24svh) minmax(230px, 1fr) auto auto;
+  gap: 10px;
+}
+
+.image-stage {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.image-stage :deep(.object-image),
+.image-stage :deep(.line-art) {
+  max-height: 100%;
+}
+
+.image-hidden {
+  opacity: 0;
+}
+
+.image-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  color: #52615d;
+  background: #fffdf7;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid #d8e1db;
+  border-top-color: #2f6f61;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
 .hint {
-  min-height: 28px;
+  min-height: 24px;
   margin: 0;
   color: #52615d;
+  text-align: center;
 }
 
 .primary-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  position: sticky;
-  bottom: 10px;
+  padding-bottom: max(2px, env(safe-area-inset-bottom));
   background: #f7f5ef;
 }
 
+.primary-actions :deep(.app-button) {
+  min-height: 62px;
+  font-size: 1.12rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 520px) {
-  .primary-actions {
-    grid-template-columns: repeat(3, 1fr);
+  .drawing-task {
+    height: calc(100svh - 72px);
+    grid-template-rows: minmax(88px, 20svh) minmax(0, 1fr) auto auto;
     gap: 6px;
-    bottom: 4px;
+  }
+
+  .primary-actions {
+    gap: 6px;
   }
 
   .hint {
-    min-height: 20px;
+    min-height: 18px;
     font-size: 0.86rem;
   }
 }

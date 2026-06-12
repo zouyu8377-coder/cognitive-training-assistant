@@ -1,10 +1,8 @@
 <template>
-  <div class="touch-box" :class="{ active: drawingEnabled }">
+  <div class="touch-box">
     <div class="draw-toolbar">
-      <strong>{{ drawingEnabled ? activeLabel : inactiveLabel }}</strong>
-      <button class="draw-toggle" type="button" @click="drawingEnabled = !drawingEnabled">
-        {{ drawingEnabled ? '暂停' : '开启' }}
-      </button>
+      <strong>{{ activeLabel || inactiveLabel }}</strong>
+      <span>请直接在下方书写</span>
     </div>
     <canvas
       ref="canvas"
@@ -15,9 +13,6 @@
       @pointerup="stopDraw"
       @pointerleave="stopDraw"
     ></canvas>
-    <p class="draw-hint">
-      {{ drawingEnabled ? '触屏书写中；点暂停后可以滑动页面。' : '鼠标可直接书写；触屏请先点开启，避免滑动时误画。' }}
-    </p>
   </div>
 </template>
 
@@ -39,7 +34,6 @@ withDefaults(
 const emit = defineEmits<{ redraw: []; draw: [] }>();
 const canvas = ref<HTMLCanvasElement>();
 const drawing = ref(false);
-const drawingEnabled = ref(false);
 const points = ref<DrawingPoint[]>([]);
 const strokeId = ref('');
 
@@ -62,7 +56,6 @@ function point(event: PointerEvent) {
 }
 
 function startDraw(event: PointerEvent) {
-  if (event.pointerType !== 'mouse' && !drawingEnabled.value) return;
   event.preventDefault();
   canvas.value?.setPointerCapture(event.pointerId);
   drawing.value = true;
@@ -96,7 +89,6 @@ function clear(shouldEmit = true) {
   const ctx = context();
   if (canvas.value) ctx?.clearRect(0, 0, canvas.value.width, canvas.value.height);
   points.value = [];
-  if (shouldEmit) drawingEnabled.value = true;
   if (shouldEmit) emit('redraw');
 }
 
@@ -125,10 +117,14 @@ onMounted(() => {
 <style scoped>
 .touch-box {
   position: relative;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   border: 2px dashed #b8c8bf;
   border-radius: 8px;
   background: #ffffff;
-  touch-action: pan-y;
+  overflow: hidden;
+  touch-action: none;
 }
 
 .draw-toolbar {
@@ -146,65 +142,29 @@ onMounted(() => {
   color: #2d5149;
 }
 
-.draw-toggle {
-  min-width: 72px;
-  min-height: 44px;
-  border: 1px solid #c8d5cc;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #2d5149;
-  font-weight: 800;
-}
-
-.touch-box.active .draw-toolbar {
-  background: #2f6f61;
-}
-
-.touch-box.active .draw-toolbar strong {
-  color: #ffffff;
+.draw-toolbar span {
+  color: #64706c;
+  font-size: 0.84rem;
 }
 
 canvas {
   display: block;
   width: 100%;
-  height: clamp(190px, 32svh, 240px);
+  height: 100%;
+  min-height: 230px;
   pointer-events: auto;
-  touch-action: pan-y;
-  cursor: crosshair;
-}
-
-.active canvas {
   touch-action: none;
-}
-
-.draw-hint {
-  margin: 0;
-  padding: 8px 12px 10px;
-  border-top: 1px solid #eef1ed;
-  color: #64706c;
-  font-size: 0.9rem;
-  line-height: 1.45;
+  cursor: crosshair;
 }
 
 @media (max-width: 520px) {
   .draw-toolbar {
-    min-height: 34px;
-    padding: 4px 8px 4px 10px;
-  }
-
-  .draw-toggle {
-    min-width: 58px;
-    min-height: 32px;
+    min-height: 36px;
+    padding: 5px 9px;
   }
 
   canvas {
-    height: 118px;
-  }
-
-  .draw-hint {
-    padding: 5px 8px 6px;
-    font-size: 0.76rem;
-    line-height: 1.3;
+    min-height: 0;
   }
 }
 </style>

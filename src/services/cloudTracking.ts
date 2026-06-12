@@ -20,6 +20,8 @@ interface QueueItem {
   payload: Record<string, unknown>;
 }
 
+export type CloudSyncResult = 'synced' | 'queued' | 'disabled';
+
 export interface AdminPatient {
   id: string;
   nickname: string;
@@ -47,10 +49,19 @@ export interface AdminActivityEvent {
   occurred_at: string;
 }
 
-function queueItem(kind: QueueItem['kind'], payload: Record<string, unknown>) {
-  const queue = loadQueue();
-  queue.push({ id: crypto.randomUUID(), kind, payload });
-  localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue.slice(-100)));
+function queueItem(kind: QueueItem['kind'], payload: Record<string, unknown>): boolean {
+  try {
+    const queue = loadQueue();
+    const next =
+      kind === 'session'
+        ? queue.filter((item) => item.kind !== 'session' || item.payload.id !== payload.id)
+        : queue;
+    next.push({ id: crypto.randomUUID(), kind, payload });
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(next.slice(-100)));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function loadQueue(): QueueItem[] {
@@ -157,16 +168,25 @@ async function sendEvent(payload: Record<string, unknown>) {
   if (error) throw error;
 }
 
-export async function syncTrainingSession(session: TrainingSession): Promise<void> {
-  if (!isCloudConfigured || !hasTrackingConsent()) return;
+export async function syncTrainingSession(session: TrainingSession): Promise<CloudSyncResult> {
+  if (!isCloudConfigured || !hasTrackingConsent()) return 'disabled';
+  const cachedPatientId = localStorage.getItem(PATIENT_ID_KEY);
+  if (cachedPatientId) queueItem('session', sessionPayload(session, cachedPatientId));
+
   try {
     const patientId = await ensurePatient(session.patientNickname);
-    if (!patientId) return;
-    await sendSession(sessionPayload(session, patientId));
-    void flushSyncQueue();
+    if (!patientId) return 'queued';
+    const payload = sessionPayload(session, patientId);
+    if (!queueItem('session', payload)) {
+      await sendSession(payload);
+      return 'synced';
+    }
+    await flushSyncQueue();
+    return loadQueue().some((item) => item.kind === 'session' && item.payload.id === session.id)
+      ? 'queued'
+      : 'synced';
   } catch {
-    const patientId = localStorage.getItem(PATIENT_ID_KEY);
-    if (patientId) queueItem('session', sessionPayload(session, patientId));
+    return 'queued';
   }
 }
 
@@ -187,8 +207,8 @@ export async function trackActivity(
       event_data: eventData,
       occurred_at: new Date().toISOString(),
     };
-    await sendEvent(payload);
-    void flushSyncQueue();
+    if (queueItem('event', payload)) await flushSyncQueue();
+    else await sendEvent(payload);
   } catch {
     const patientId = localStorage.getItem(PATIENT_ID_KEY);
     if (patientId) {
@@ -203,21 +223,32 @@ export async function trackActivity(
   }
 }
 
-export async function flushSyncQueue(): Promise<void> {
-  if (!supabase || !navigator.onLine || !hasTrackingConsent()) return;
-  const queue = loadQueue();
-  if (!queue.length) return;
+let activeFlush: Promise<void> | undefined;
 
-  const remaining: QueueItem[] = [];
-  for (const item of queue) {
-    try {
-      if (item.kind === 'session') await sendSession(item.payload);
-      else await sendEvent(item.payload);
-    } catch {
-      remaining.push(item);
+export async function flushSyncQueue(): Promise<void> {
+  if (activeFlush) return activeFlush;
+  activeFlush = (async () => {
+    if (!supabase || !navigator.onLine || !hasTrackingConsent()) return;
+    const queue = loadQueue();
+    if (!queue.length) return;
+
+    const remaining: QueueItem[] = [];
+    for (const item of queue) {
+      try {
+        if (item.kind === 'session') await sendSession(item.payload);
+        else await sendEvent(item.payload);
+      } catch {
+        remaining.push(item);
+      }
     }
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(remaining));
+  })();
+
+  try {
+    await activeFlush;
+  } finally {
+    activeFlush = undefined;
   }
-  localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(remaining));
 }
 
 export function watchConnectivity() {

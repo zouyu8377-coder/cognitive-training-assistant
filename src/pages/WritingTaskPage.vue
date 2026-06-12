@@ -1,14 +1,18 @@
 <template>
-  <PageContainer>
-    <ProgressHeader title="写名字" label="触屏书写" />
-    <section class="task stack">
-      <p>请在下面的手写区写一次自己的名字。写完后点击“已完成”。</p>
-      <DrawingCanvas ref="canvas" inactive-label="手写区" active-label="正在手写" @draw="hasWriting = true" />
+  <PageContainer class="drawing-page">
+    <ProgressHeader title="写名字" label="触屏书写">
+      <template #action>
+        <button type="button" @click="choose('skipped')">跳过</button>
+      </template>
+    </ProgressHeader>
+
+    <section class="task">
+      <p>请在下面的手写区写一次自己的名字。</p>
+      <DrawingCanvas ref="canvas" inactive-label="手写区" active-label="请写下自己的名字" @draw="hasWriting = true" />
+      <p class="message">{{ message || ' ' }}</p>
       <div class="writing-actions">
-        <AppButton tone="quiet" block @click="clearCanvas">清空重写</AppButton>
-        <AppButton block @click="choose('completed')">已完成</AppButton>
-        <AppButton tone="secondary" block @click="choose('skipped')">今天不想做</AppButton>
-        <AppButton tone="quiet" block @click="choose('help_needed')">需要帮助</AppButton>
+        <AppButton tone="quiet" block @click="clearCanvas">重写</AppButton>
+        <AppButton block @click="completeWriting">手写完成</AppButton>
       </div>
     </section>
   </PageContainer>
@@ -29,10 +33,12 @@ const router = useRouter();
 const store = useTrainingStore();
 const canvas = ref<InstanceType<typeof DrawingCanvas>>();
 const hasWriting = ref(false);
+const message = ref('');
 
 function clearCanvas() {
   canvas.value?.clear();
   hasWriting.value = false;
+  message.value = '可以重新写。';
 }
 
 function choose(status: TrainingSession['writingStatus']) {
@@ -41,29 +47,58 @@ function choose(status: TrainingSession['writingStatus']) {
   store.setWritingStatus(status, writingDataUrl);
   router.push(nextTaskRoute(store.state.settings, session));
 }
+
+function completeWriting() {
+  if (!hasWriting.value) {
+    message.value = '请先写几笔，也可以点右上角跳过。';
+    return;
+  }
+  choose('completed');
+}
 </script>
 
 <style scoped>
+.drawing-page {
+  height: 100svh;
+  overflow: hidden;
+}
+
 .task {
-  min-height: calc(100svh - 116px);
-  align-content: start;
+  height: calc(100svh - 92px);
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(280px, 1fr) auto auto;
+  gap: 10px;
 }
 
 p {
   margin: 0;
-  font-size: 1.2rem;
-  line-height: 1.55;
+  font-size: 1.12rem;
+  line-height: 1.45;
+}
+
+.message {
+  color: #735a1d;
+  text-align: center;
+  font-size: 0.92rem;
 }
 
 .writing-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  padding-bottom: max(2px, env(safe-area-inset-bottom));
+}
+
+.writing-actions :deep(.app-button) {
+  min-height: 64px;
+  font-size: 1.12rem;
 }
 
 @media (max-width: 520px) {
   .task {
-    min-height: calc(100svh - 72px);
+    height: calc(100svh - 72px);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     gap: 8px;
   }
 
