@@ -42,17 +42,17 @@
         <input v-model="form.includeSingingTask" type="checkbox" />
         包含跟唱记录任务
       </label>
-      <label class="check consent">
-        <input v-model="form.cloudTrackingConsent" type="checkbox" />
-        <span>允许上传训练记录，让项目管理员可以在其他设备查看使用情况</span>
-      </label>
+      <section class="consent" aria-label="云端记录说明">
+        <strong>云端记录已开启</strong>
+        <span>患者昵称、练习过程和完成情况会上传，供项目管理员在其他设备查看使用情况。</span>
+      </section>
       <p v-if="cloudMessage" class="cloud-message" :class="cloudStatus" role="status">{{ cloudMessage }}</p>
       <p class="muted">默认设置偏低压力，优先帮助完成和保持参与意愿。</p>
       <AppButton type="submit" block :disabled="saving">
         {{ saving ? '正在检查云端连接...' : '保存并查看今日训练' }}
       </AppButton>
       <p class="privacy-note">
-        启用云端记录后，患者昵称、练习过程和完成情况会安全上传，供本项目管理员了解试用情况。
+        云端记录固定开启。患者昵称、练习过程和完成情况会安全上传，供本项目管理员了解试用情况。
       </p>
     </form>
   </PageContainer>
@@ -80,6 +80,7 @@ async function save() {
   saving.value = true;
   const settings = {
     ...form,
+    cloudTrackingConsent: true,
     patientNickname: form.patientNickname.trim() || '家人',
     includeSubtraction: ['L2', 'L4', 'L5', 'L6'].includes(form.mathLevel),
   };
@@ -126,12 +127,22 @@ select {
 }
 
 .consent {
+  display: grid;
+  gap: 6px;
   padding: 12px;
-  border: 1px solid #d3ded7;
+  border: 1px solid #9fc9ad;
   border-radius: 8px;
-  background: #ffffff;
-  font-weight: 700;
+  background: #f1f8f3;
   line-height: 1.5;
+}
+
+.consent strong {
+  color: #245f48;
+}
+
+.consent span {
+  color: #52615d;
+  font-size: 0.92rem;
 }
 
 .cloud-message {

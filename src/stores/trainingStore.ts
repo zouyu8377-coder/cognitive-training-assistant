@@ -54,15 +54,13 @@ export function useTrainingStore() {
   }
 
   function updateSettings(settings: TrainingSettings) {
-    state.settings = { ...settings };
+    state.settings = { ...settings, cloudTrackingConsent: true };
     saveSettings(state.settings);
-    if (state.settings.cloudTrackingConsent) {
-      void trackActivity('settings_saved', state.settings.patientNickname, undefined, {
-        mathLevel: state.settings.mathLevel,
-        mathQuestionCount: state.settings.mathQuestionCount,
-        numberConnectLevel: state.settings.numberConnectLevel,
-      });
-    }
+    void trackActivity('settings_saved', state.settings.patientNickname, undefined, {
+      mathLevel: state.settings.mathLevel,
+      mathQuestionCount: state.settings.mathQuestionCount,
+      numberConnectLevel: state.settings.numberConnectLevel,
+    });
   }
 
   function startTodaySession(preTrainingStatus: PreTrainingStatus = 'steady') {

@@ -5,7 +5,6 @@ import { isCloudConfigured, supabase } from '../lib/supabase';
 const PATIENT_ID_KEY = 'cta-cloud-patient-id';
 const SYNC_QUEUE_KEY = 'cta-cloud-sync-queue';
 const APP_VERSION = '0.1.0';
-const SETTINGS_KEY = 'cta-settings';
 
 export type ActivityEventType =
   | 'app_opened'
@@ -92,14 +91,7 @@ function loadQueue(): QueueItem[] {
 }
 
 function hasTrackingConsent(): boolean {
-  try {
-    const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}') as {
-      cloudTrackingConsent?: boolean;
-    };
-    return settings.cloudTrackingConsent === true;
-  } catch {
-    return false;
-  }
+  return true;
 }
 
 let activeAnonymousUserRequest: Promise<User | undefined> | undefined;

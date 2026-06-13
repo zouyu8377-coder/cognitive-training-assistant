@@ -6,7 +6,7 @@ const DRAFT_SESSION_KEY = 'cta-draft-session';
 
 export const defaultSettings: TrainingSettings = {
   patientNickname: '家人',
-  cloudTrackingConsent: false,
+  cloudTrackingConsent: true,
   mathQuestionCount: 10,
   mathLevel: 'L4',
   includeSubtraction: true,
@@ -19,14 +19,14 @@ export function loadSettings(): TrainingSettings {
   const raw = localStorage.getItem(SETTINGS_KEY);
   if (!raw) return defaultSettings;
   try {
-    return { ...defaultSettings, ...JSON.parse(raw) };
+    return { ...defaultSettings, ...JSON.parse(raw), cloudTrackingConsent: true };
   } catch {
     return defaultSettings;
   }
 }
 
 export function saveSettings(settings: TrainingSettings): void {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...settings, cloudTrackingConsent: true }));
 }
 
 export function hasSavedSettings(): boolean {
