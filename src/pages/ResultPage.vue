@@ -2,9 +2,22 @@
   <PageContainer>
     <ProgressHeader title="训练结果" label="家属查看" />
     <section v-if="session" class="stack">
-      <ResultCard>
-        <h2>{{ session.patientNickname }}</h2>
-        <p>训练日期：{{ session.date }}</p>
+      <ResultCard class="result-summary">
+        <div class="summary-heading">
+          <div>
+            <p class="eyebrow">本次练习</p>
+            <h1>{{ session.patientNickname }}</h1>
+            <p>{{ session.date }}</p>
+          </div>
+          <span class="complete-badge">{{ session.completedAt ? '已完成' : '未完成' }}</span>
+        </div>
+        <div class="summary-metrics">
+          <span><strong>{{ correctMath }}/{{ session.mathQuestions.length }}</strong>数学正确</span>
+          <span><strong>{{ objectCompleted }}/{{ objectTotal }}</strong>看图写名称</span>
+          <span><strong>{{ formatDuration(totalDuration) }}</strong>总用时</span>
+        </div>
+        <details>
+          <summary>查看总体信息</summary>
         <p>开始前状态：{{ preStatusText }}</p>
         <p>数学已尝试：{{ answeredMath }} / {{ session.mathQuestions.length }}</p>
         <p>数学正确：{{ correctMath }}</p>
@@ -19,7 +32,7 @@
         <p>写名字：{{ writingText }}</p>
         <img v-if="session.writingDataUrl" class="drawing-preview" :src="session.writingDataUrl" alt="手写名字记录" />
         <p>跟唱：{{ singingText }}</p>
-        <p>本次总耗时：{{ formatDuration(totalDuration) }}</p>
+        </details>
       </ResultCard>
 
       <ResultCard>
@@ -256,6 +269,67 @@ h2 {
   margin: 0 0 10px;
 }
 
+.summary-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.summary-heading h1 {
+  margin: 2px 0;
+  font-size: 1.55rem;
+}
+
+.eyebrow {
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.complete-badge {
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #226c4d;
+  background: #e8f5ed;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.summary-metrics span {
+  display: grid;
+  gap: 5px;
+  padding: 12px 6px;
+  border-radius: 6px;
+  background: #f1f5f2;
+  color: var(--color-muted);
+  text-align: center;
+  font-size: 0.78rem;
+}
+
+.summary-metrics strong {
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+details {
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+summary {
+  color: var(--color-primary);
+  font-weight: 800;
+  cursor: pointer;
+}
+
 p {
   margin: 9px 0;
 }
@@ -283,9 +357,15 @@ textarea {
   display: grid;
   gap: 6px;
   padding: 12px;
-  border: 1px solid #d8e1db;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   background: #ffffff;
+}
+
+@media (max-width: 380px) {
+  .summary-metrics {
+    grid-template-columns: 1fr;
+  }
 }
 
 .question-row span {

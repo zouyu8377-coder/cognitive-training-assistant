@@ -9,7 +9,9 @@
     <section class="drawing-task">
       <ResultCard class="reference-stage">
         <h2>{{ task.referenceImageUrl ? '请照着图片画一遍' : `请照着画一个${task.shapeName}` }}</h2>
-        <LineArt :kind="task.referenceImageUrl ?? task.shapeKind" :label="task.shapeName" />
+        <div class="reference-art">
+          <LineArt :kind="task.referenceImageUrl ?? task.shapeKind" :label="task.shapeName" />
+        </div>
       </ResultCard>
 
       <DrawingCanvas ref="canvas" inactive-label="绘图区" active-label="请照着上方图形画" @redraw="redrawCount += 1" />
@@ -127,13 +129,28 @@ function skip() {
 .reference-stage {
   min-height: 0;
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 6px;
   place-items: center;
+  padding: 10px;
   overflow: hidden;
 }
 
-.reference-stage :deep(.object-image),
-.reference-stage :deep(.line-art) {
-  max-height: calc(100% - 28px);
+.reference-art {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.reference-art :deep(.object-image),
+.reference-art :deep(.line-art) {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
 }
 
 h2 {
@@ -153,11 +170,11 @@ h2 {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   padding-bottom: max(2px, env(safe-area-inset-bottom));
-  background: #f7f5ef;
+  background: var(--color-background);
 }
 
 .primary-actions :deep(.app-button) {
-  min-height: 62px;
+  min-height: 66px;
   font-size: 1.12rem;
 }
 

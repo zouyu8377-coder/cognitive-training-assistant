@@ -15,7 +15,7 @@
           {{ dot.value }}
         </button>
       </div>
-      <p class="hint">{{ hint }}</p>
+      <p class="hint"><strong>{{ hint }}</strong></p>
       <div class="actions">
         <AppButton tone="quiet" block @click="finish(false)">今天先到这里</AppButton>
       </div>
@@ -108,9 +108,9 @@ function tap(value: number) {
   position: relative;
   height: 100%;
   min-height: 300px;
-  border: 1px solid #d8dccf;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #fffdf7;
+  background: var(--color-surface);
 }
 
 .dot {
@@ -118,7 +118,7 @@ function tap(value: number) {
   width: clamp(52px, 13vw, 64px);
   height: clamp(52px, 13vw, 64px);
   transform: translate(-50%, -50%);
-  border: 2px solid #78a08f;
+  border: 3px solid #79a798;
   border-radius: 50%;
   background: #ffffff;
   color: #213633;
@@ -127,15 +127,17 @@ function tap(value: number) {
 }
 
 .dot.done {
-  background: #dfe9df;
-  color: #789084;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #ffffff;
 }
 
 .hint {
   min-height: 30px;
   margin: 0;
   font-size: 1.08rem;
-  color: #52615d;
+  color: var(--color-primary);
+  text-align: center;
 }
 
 .actions {

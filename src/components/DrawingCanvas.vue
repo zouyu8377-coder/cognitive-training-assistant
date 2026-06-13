@@ -120,7 +120,7 @@ onMounted(() => {
   min-height: 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  border: 2px dashed #b8c8bf;
+  border: 2px solid #c9d8d0;
   border-radius: 8px;
   background: #ffffff;
   overflow: hidden;
@@ -132,10 +132,10 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 48px;
+  min-height: 46px;
   padding: 8px 10px 8px 14px;
   border-bottom: 1px solid #d8e1db;
-  background: #eef4ef;
+  background: #edf5f1;
 }
 
 .draw-toolbar strong {
@@ -151,7 +151,7 @@ canvas {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 230px;
+  min-height: 260px;
   pointer-events: auto;
   touch-action: none;
   cursor: crosshair;
@@ -159,8 +159,8 @@ canvas {
 
 @media (max-width: 520px) {
   .draw-toolbar {
-    min-height: 36px;
-    padding: 5px 9px;
+    min-height: 40px;
+    padding: 6px 10px;
   }
 
   canvas {

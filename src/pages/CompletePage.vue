@@ -1,10 +1,12 @@
 <template>
   <PageContainer>
     <section class="complete stack">
-      <div class="flower">小红花</div>
-      <h1>今天的练习完成啦，辛苦了！</h1>
-      <p>今日训练已完成，可以休息一下。</p>
+      <div class="flower" aria-hidden="true">★</div>
+      <p class="eyebrow">今天的练习已完成</p>
+      <h1>做得真好，辛苦了！</h1>
+      <p class="encouragement">每一次认真练习都很了不起。现在可以放松休息一下。</p>
       <p class="sync-status" :class="syncState">{{ syncMessage }}</p>
+      <RouterLink to="/history"><AppButton block>查看今天的记录</AppButton></RouterLink>
       <RouterLink to="/"><AppButton tone="secondary" block>返回首页</AppButton></RouterLink>
     </section>
   </PageContainer>
@@ -41,20 +43,35 @@ onMounted(async () => {
 }
 
 .flower {
-  width: 112px;
-  height: 112px;
+  width: 104px;
+  height: 104px;
   display: grid;
   place-items: center;
   margin: 0 auto;
   border-radius: 50%;
-  background: #f0d991;
-  color: #4c4220;
+  border: 10px solid #fff1b9;
+  background: var(--color-accent);
+  color: #684f0e;
+  font-size: 2.4rem;
   font-weight: 900;
 }
 
 h1 {
   margin: 0;
   font-size: 2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.encouragement {
+  margin: 0 auto;
+  max-width: 480px;
+  color: var(--color-muted);
+  line-height: 1.7;
 }
 
 .sync-status {

@@ -1,6 +1,6 @@
 <template>
   <PageContainer>
-    <ProgressHeader title="今日训练" label="准备开始" />
+    <ProgressHeader title="今日训练" label="轻松完成每一项" />
     <section class="stack">
       <ResultCard class="cloud-card" :class="cloudStatus">
         <h2>云端记录</h2>
@@ -10,17 +10,15 @@
         </RouterLink>
       </ResultCard>
 
-      <ResultCard>
-        <h2>{{ store.state.settings.patientNickname || '家人' }}，今天有这些练习</h2>
-        <ul>
-          <li>数学练习：{{ store.state.settings.mathQuestionCount }} 题</li>
-          <li>数字顺序练习：1-{{ store.state.settings.numberConnectLevel }}</li>
-          <li>看图写名称：4 题</li>
-          <li>照着画图形：1 题</li>
-          <li>找不同：3 题</li>
-          <li v-if="store.state.settings.includeWritingTask">写名字</li>
-          <li v-if="store.state.settings.includeSingingTask">跟唱记录</li>
-        </ul>
+      <ResultCard class="training-list">
+        <h1>{{ store.state.settings.patientNickname || '家人' }}，准备好了吗？</h1>
+        <p>今天安排了几项轻松练习，按照顺序慢慢来。</p>
+        <div class="task-row"><span>1</span><strong>数学练习</strong><small>{{ store.state.settings.mathQuestionCount }} 题</small></div>
+        <div class="task-row"><span>2</span><strong>数字顺序</strong><small>1-{{ store.state.settings.numberConnectLevel }}</small></div>
+        <div class="task-row"><span>3</span><strong>看图与绘画</strong><small>轻松完成</small></div>
+        <div class="task-row"><span>4</span><strong>找不同</strong><small>3 题</small></div>
+        <div v-if="store.state.settings.includeWritingTask" class="task-row"><span>5</span><strong>写名字</strong><small>手写练习</small></div>
+        <div v-if="store.state.settings.includeSingingTask" class="task-row"><span>♪</span><strong>跟唱记录</strong><small>熟悉的歌</small></div>
       </ResultCard>
 
       <ResultCard v-if="todaySessions.length > 0">
@@ -29,24 +27,10 @@
         <RouterLink to="/history"><AppButton tone="secondary" block>查看今日记录</AppButton></RouterLink>
       </ResultCard>
 
-      <ResultCard>
-        <h2>开始前确认</h2>
-        <p class="muted">请家属简单看一下今天状态。这里只用于调整练习节奏，不做医学判断。</p>
-        <div class="status-options">
-          <label v-for="item in statusOptions" :key="item.value" class="status-option">
-            <input v-model="preStatus" type="radio" :value="item.value" />
-            <span>{{ item.label }}</span>
-          </label>
-        </div>
-        <p v-if="preStatus !== 'steady'" class="notice small">
-          今天可以从短练习开始，必要时减少题量或只做容易完成的任务。
-        </p>
-      </ResultCard>
-
       <AppButton v-if="store.state.currentSession" tone="secondary" block @click="continueDraft">
         继续未完成训练
       </AppButton>
-      <AppButton block @click="start">开始新的训练</AppButton>
+      <AppButton class="start-training" block @click="start">▶ 开始今天的训练</AppButton>
       <div v-if="confirmStartNew" class="inline-confirm">
         <p>开始新的训练会放弃上次未完成进度。</p>
         <div>
@@ -67,16 +51,13 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
-import type { PreTrainingStatus } from '../types';
 import { todayKey } from '../utils/date';
-import { preTrainingStatusText } from '../utils/sessionInsights';
 import { loadSessions } from '../utils/storage';
 import { nextTaskRoute } from '../utils/trainingFlow';
 import { prepareCloudTracking, type CloudConnectionStatus } from '../services/cloudTracking';
 
 const router = useRouter();
 const store = useTrainingStore();
-const preStatus = ref<PreTrainingStatus>('steady');
 const confirmStartNew = ref(false);
 const cloudStatus = ref<CloudConnectionStatus>(
   store.state.settings.cloudTrackingConsent ? 'pending' : 'disabled',
@@ -87,11 +68,6 @@ const cloudMessage = ref(
     : '云端记录未开启，管理员无法看到本次练习。',
 );
 const todaySessions = loadSessions().filter((session) => session.date === todayKey());
-const statusOptions = (Object.keys(preTrainingStatusText) as PreTrainingStatus[]).map((value) => ({
-  value,
-  label: preTrainingStatusText[value],
-}));
-
 onMounted(refreshCloudStatus);
 
 async function refreshCloudStatus() {
@@ -111,7 +87,7 @@ function start() {
 function startConfirmed() {
   confirmStartNew.value = false;
   store.discardCurrentSession();
-  store.startTodaySession(preStatus.value);
+  store.startTodaySession('steady');
   router.push('/math');
 }
 
@@ -126,37 +102,42 @@ h2 {
   margin: 0 0 12px;
 }
 
-li {
-  margin: 10px 0;
-  font-size: 1.1rem;
+.training-list h1 {
+  margin: 0;
+  font-size: 1.4rem;
 }
 
-.status-options {
-  display: grid;
-  gap: 10px;
-  margin-top: 14px;
+.training-list > p {
+  color: var(--color-muted);
+  line-height: 1.6;
 }
 
-.status-option {
+.task-row {
   display: grid;
-  grid-template-columns: 28px 1fr;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
   align-items: center;
-  min-height: 48px;
-  padding: 8px 10px;
-  border: 1px solid #d3ded7;
-  border-radius: 8px;
-  background: #ffffff;
+  gap: 10px;
+  min-height: 58px;
+  border-top: 1px solid #e2e8e4;
+}
+
+.task-row > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
   font-weight: 800;
 }
 
-.status-option input {
-  width: 22px;
-  height: 22px;
+.task-row small {
+  color: var(--color-muted);
 }
 
-.small {
-  margin-top: 12px;
-  font-size: 0.96rem;
+.start-training {
+  min-height: 64px;
 }
 
 .inline-confirm {

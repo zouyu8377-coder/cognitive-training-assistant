@@ -1,16 +1,26 @@
 <template>
   <PageContainer>
     <section class="hero">
-      <h1>居家认知训练助手</h1>
-      <p class="lead">今天一起做几个轻松的小练习。</p>
-      <AppButton class="start-button" block @click="startPractice">开始练习</AppButton>
+      <header class="brand-bar">
+        <strong>居家认知训练助手</strong>
+        <span aria-hidden="true">◎</span>
+      </header>
+
+      <div class="welcome">
+        <h1>今天感觉怎么样？<br />我们轻松练一会儿</h1>
+        <p class="lead">坚持练习，每天都有进步。</p>
+      </div>
+
+      <div class="main-actions">
+        <AppButton class="start-button" block @click="startPractice">▶ 开始今天的练习</AppButton>
+        <AppButton v-if="store.state.currentSession" tone="secondary" block @click="continueDraft">
+          ↻ 继续上次练习
+        </AppButton>
+      </div>
 
       <div class="secondary-actions">
-        <AppButton v-if="store.state.currentSession" tone="secondary" block @click="continueDraft">
-          继续练习
-        </AppButton>
-        <RouterLink to="/setup"><AppButton tone="quiet" block>设置练习</AppButton></RouterLink>
-        <RouterLink to="/history"><AppButton tone="quiet" block>历史记录</AppButton></RouterLink>
+        <RouterLink to="/setup"><AppButton tone="quiet" block>⚙ 练习设置</AppButton></RouterLink>
+        <RouterLink to="/history"><AppButton tone="quiet" block>▣ 历史记录</AppButton></RouterLink>
       </div>
 
       <p class="notice compact">
@@ -45,25 +55,44 @@ function continueDraft() {
 .hero {
   min-height: calc(100svh - 56px);
   display: grid;
-  align-content: center;
-  gap: 18px;
+  grid-template-rows: auto 1fr auto auto auto;
+  gap: 20px;
 }
 
-h1 {
+.brand-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-primary);
+}
+
+.welcome {
+  align-self: center;
+}
+
+.welcome h1 {
   margin: 0;
-  font-size: clamp(2rem, 8vw, 2.6rem);
-  line-height: 1.18;
+  font-size: clamp(1.85rem, 7vw, 2.55rem);
+  line-height: 1.3;
 }
 
 .lead {
-  margin: 0;
-  font-size: 1.15rem;
-  color: #52615d;
+  margin: 14px 0 0;
+  font-size: 1.05rem;
+  color: var(--color-muted);
+}
+
+.main-actions {
+  display: grid;
+  gap: 10px;
 }
 
 .start-button {
-  min-height: 58px;
-  font-size: 1.2rem;
+  min-height: 64px;
+  font-size: 1.08rem;
 }
 
 .secondary-actions {
@@ -72,13 +101,20 @@ h1 {
   gap: 10px;
 }
 
-.secondary-actions > :first-child {
-  grid-column: 1 / -1;
-}
-
 .compact {
   margin: 0;
-  padding: 12px;
-  font-size: 0.92rem;
+  padding: 10px 0 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  background: transparent;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 520px) {
+  .hero {
+    gap: 16px;
+  }
 }
 </style>

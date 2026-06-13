@@ -137,12 +137,19 @@ function imageFailed() {
   min-height: 0;
   display: grid;
   place-items: center;
+  padding: 10px;
   overflow: hidden;
 }
 
 .image-stage :deep(.object-image),
 .image-stage :deep(.line-art) {
-  max-height: 100%;
+  position: absolute;
+  inset: 10px;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
 }
 
 .image-hidden {
@@ -182,11 +189,11 @@ function imageFailed() {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   padding-bottom: max(2px, env(safe-area-inset-bottom));
-  background: #f7f5ef;
+  background: var(--color-background);
 }
 
 .primary-actions :deep(.app-button) {
-  min-height: 62px;
+  min-height: 66px;
   font-size: 1.12rem;
 }
 
@@ -200,7 +207,7 @@ function imageFailed() {
   .drawing-task {
     height: calc(100svh - 72px);
     grid-template-rows: minmax(88px, 20svh) minmax(0, 1fr) auto auto;
-    gap: 6px;
+    gap: 8px;
   }
 
   .primary-actions {

@@ -3,9 +3,9 @@
     <button v-for="key in keys" :key="key" type="button" @click="$emit('press', key)">
       {{ key }}
     </button>
-    <button type="button" @click="$emit('clear')">清空</button>
+    <button class="utility" type="button" @click="$emit('clear')">清空</button>
     <button type="button" @click="$emit('press', 0)">0</button>
-    <button type="button" @click="$emit('backspace')">退格</button>
+    <button class="utility" type="button" @click="$emit('backspace')">退格</button>
   </div>
 </template>
 
@@ -27,12 +27,22 @@ const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 }
 
 button {
-  min-height: clamp(48px, 8.5svh, 64px);
-  border: 1px solid #cad8d1;
+  min-height: clamp(56px, 8.5svh, 68px);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   background: #ffffff;
-  color: #213633;
+  color: var(--color-text);
   font-size: clamp(1.1rem, 4.6vw, 1.3rem);
   font-weight: 800;
+}
+
+button:active {
+  background: var(--color-primary-soft);
+}
+
+.utility {
+  color: var(--color-muted);
+  background: #edf1ed;
+  font-size: 0.88rem;
 }
 </style>

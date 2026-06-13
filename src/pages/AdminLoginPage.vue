@@ -1,8 +1,12 @@
 <template>
   <PageContainer>
-    <ProgressHeader title="管理端登录" label="试用活动记录" />
-    <form class="admin-form stack" @submit.prevent="login">
-      <p class="muted">仅限已授权的管理员查看试用用户活动。</p>
+    <form class="admin-form" @submit.prevent="login">
+      <div class="admin-brand">居家认知训练助手</div>
+      <div>
+        <p class="eyebrow">管理端</p>
+        <h1>登录查看试用记录</h1>
+        <p class="muted">仅限已授权的管理员查看用户活动与详细答题记录。</p>
+      </div>
       <label>
         邮箱
         <input v-model.trim="email" type="email" autocomplete="username" required />
@@ -24,7 +28,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppButton from '../components/AppButton.vue';
 import PageContainer from '../components/PageContainer.vue';
-import ProgressHeader from '../components/ProgressHeader.vue';
 import { isCloudConfigured } from '../lib/supabase';
 import { isCurrentUserAdmin, signInAdmin } from '../services/cloudTracking';
 
@@ -54,8 +57,31 @@ async function login() {
 
 <style scoped>
 .admin-form {
-  max-width: 480px;
-  margin: 40px auto 0;
+  max-width: 440px;
+  min-height: calc(100svh - 56px);
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  margin: 0 auto;
+}
+
+.admin-brand {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+h1 {
+  margin: 3px 0 10px;
+  font-size: 1.75rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 label {
@@ -77,4 +103,3 @@ input {
   color: #9b2c2c;
 }
 </style>
-

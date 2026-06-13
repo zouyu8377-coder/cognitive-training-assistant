@@ -91,7 +91,7 @@ p {
 }
 
 .writing-actions :deep(.app-button) {
-  min-height: 64px;
+  min-height: 68px;
   font-size: 1.12rem;
 }
 

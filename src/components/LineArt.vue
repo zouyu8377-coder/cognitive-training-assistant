@@ -89,7 +89,8 @@ onMounted(() => {
 <style scoped>
 .line-art {
   width: 100%;
-  max-width: 280px;
+  max-width: 260px;
+  max-height: 100%;
   aspect-ratio: 1.23;
   display: block;
   margin: 0 auto;
@@ -98,7 +99,7 @@ onMounted(() => {
 .object-image {
   width: 100%;
   max-width: 360px;
-  max-height: 280px;
+  max-height: 260px;
   display: block;
   margin: 0 auto;
   object-fit: contain;
@@ -106,11 +107,11 @@ onMounted(() => {
 
 @media (max-width: 520px) {
   .line-art {
-    max-width: 170px;
+    max-width: 150px;
   }
 
   .object-image {
-    max-height: 108px;
+    max-height: 118px;
   }
 }
 </style>

@@ -2,12 +2,12 @@
   <main class="admin-page">
     <header class="admin-header">
       <div>
-        <p>试用活动记录</p>
+        <p>居家认知训练助手 / 试用记录</p>
         <h1>用户使用概览</h1>
       </div>
       <div class="header-actions">
-        <button type="button" title="刷新" aria-label="刷新" @click="refresh">↻</button>
-        <button type="button" title="退出登录" aria-label="退出登录" @click="logout">退出</button>
+        <button type="button" title="刷新数据" aria-label="刷新数据" @click="refresh">↻</button>
+        <button class="logout" type="button" title="退出登录" aria-label="退出登录" @click="logout">退出</button>
       </div>
     </header>
 
@@ -48,6 +48,9 @@
           日期
           <input v-model="selectedDate" type="date" />
         </label>
+        <button v-if="selectedPatientId || selectedDate" class="clear-filter" type="button" @click="selectedPatientId = ''; selectedDate = ''">
+          清除筛选
+        </button>
       </section>
 
       <section class="table-section">
@@ -210,7 +213,7 @@ function eventName(type: string) {
 
 <style scoped>
 .admin-page {
-  width: min(100%, 1180px);
+  width: min(100%, 1240px);
   min-height: 100vh;
   margin: 0 auto;
   padding: 24px;
@@ -221,7 +224,10 @@ function eventName(type: string) {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
+  min-height: 64px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .admin-header p,
@@ -247,18 +253,23 @@ function eventName(type: string) {
 .header-actions button {
   min-width: 44px;
   min-height: 40px;
-  border: 1px solid #c8d5cc;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   background: #ffffff;
-  color: #36504a;
+  color: var(--color-primary);
   cursor: pointer;
+}
+
+.header-actions .logout {
+  padding: 0 14px;
+  color: var(--color-muted);
 }
 
 .summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid #d8e1db;
-  border-bottom: 1px solid #d8e1db;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
   background: #ffffff;
 }
 
@@ -266,7 +277,7 @@ function eventName(type: string) {
   display: grid;
   gap: 6px;
   padding: 18px;
-  border-right: 1px solid #d8e1db;
+  border-right: 1px solid var(--color-border);
 }
 
 .summary div:last-child {
@@ -279,13 +290,24 @@ function eventName(type: string) {
 }
 
 .summary strong {
-  font-size: 1.6rem;
+  color: var(--color-primary);
+  font-size: 1.7rem;
 }
 
 .toolbar {
   display: flex;
+  align-items: end;
   gap: 16px;
   padding: 18px 0;
+}
+
+.clear-filter {
+  min-height: 42px;
+  border: 0;
+  color: var(--color-primary);
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .toolbar label {
@@ -334,7 +356,8 @@ function eventName(type: string) {
 
 .table-scroll {
   overflow-x: auto;
-  border: 1px solid #d8e1db;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
 }
 
 table {
@@ -353,20 +376,22 @@ td {
 }
 
 th {
-  color: #52615d;
-  background: #f3f6f3;
+  color: var(--color-muted);
+  background: #edf3ef;
 }
 
 .activity-list {
-  border-top: 1px solid #d8e1db;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
 }
 
 .activity-row {
   display: grid;
   grid-template-columns: minmax(120px, 1fr) minmax(160px, 2fr) 180px;
   gap: 16px;
-  padding: 12px 4px;
-  border-bottom: 1px solid #d8e1db;
+  padding: 12px;
+  border-bottom: 1px solid var(--color-border);
   font-size: 0.9rem;
 }
 

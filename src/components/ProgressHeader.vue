@@ -1,6 +1,9 @@
 <template>
   <header class="progress-header">
-    <button class="back" type="button" @click="goBack">返回</button>
+    <button class="back" type="button" aria-label="返回" @click="goBack">
+      <span aria-hidden="true">←</span>
+      <span class="back-text">返回</span>
+    </button>
     <div class="title">
       <p>{{ label }}</p>
       <strong>{{ title }}</strong>
@@ -29,7 +32,9 @@ function goBack() {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
-  margin-bottom: 20px;
+  min-height: 52px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .title {
@@ -41,46 +46,51 @@ function goBack() {
 }
 
 .header-action :deep(button) {
-  min-width: 72px;
-  min-height: 46px;
-  border: 1px solid #cbd8d1;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #38504b;
+  min-width: 58px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font-weight: 700;
 }
 
 .back {
-  min-width: 72px;
-  min-height: 46px;
-  border: 1px solid #cbd8d1;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #38504b;
+  min-width: 58px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 700;
 }
 
 p {
   margin: 0 0 4px;
-  color: #68736f;
+  color: var(--color-muted);
+  font-size: 0.82rem;
 }
 
 strong {
-  font-size: 1.35rem;
+  font-size: 1.2rem;
 }
 
 @media (max-width: 520px) {
   .progress-header {
-    gap: 10px;
+    gap: 6px;
+    min-height: 48px;
     margin-bottom: 8px;
   }
 
   .back {
-    min-width: 58px;
-    min-height: 36px;
+    min-width: 44px;
+    min-height: 42px;
   }
 
   .header-action :deep(button) {
-    min-width: 58px;
-    min-height: 36px;
+    min-width: 50px;
+    min-height: 42px;
   }
 
   p {
@@ -89,7 +99,13 @@ strong {
   }
 
   strong {
-    font-size: 1.08rem;
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .back-text {
+    display: none;
   }
 }
 </style>

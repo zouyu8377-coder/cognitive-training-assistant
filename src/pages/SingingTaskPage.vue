@@ -2,11 +2,14 @@
   <PageContainer>
     <ProgressHeader title="跟唱记录" label="熟悉的歌" />
     <section class="task stack">
-      <p>可以选择一首熟悉的歌曲，听一听或跟着唱一小段。完成后点击对应状态。</p>
-      <AppButton block @click="choose('completed_good')">已完成，状态不错</AppButton>
-      <AppButton tone="secondary" block @click="choose('completed_tired')">已完成，但有些疲劳</AppButton>
-      <AppButton tone="quiet" block @click="choose('skipped')">今天不想做</AppButton>
-      <AppButton tone="quiet" block @click="choose('not_done')">未进行</AppButton>
+      <div class="music-mark" aria-hidden="true">♪</div>
+      <h1>唱一首熟悉的歌</h1>
+      <p>听一听，或者跟着唱一小段都可以。完成后选择最接近的感受。</p>
+      <div class="choices">
+        <AppButton block @click="choose('completed_good')">唱完了，感觉不错</AppButton>
+        <AppButton tone="secondary" block @click="choose('completed_tired')">唱完了，有些累</AppButton>
+        <AppButton tone="quiet" block @click="choose('skipped')">今天先不唱</AppButton>
+      </div>
     </section>
   </PageContainer>
 </template>
@@ -32,11 +35,39 @@ function choose(status: TrainingSession['singingStatus']) {
 
 <style scoped>
 .task {
-  padding-top: 20px;
+  min-height: calc(100svh - 100px);
+  align-content: center;
+  text-align: center;
+}
+
+.music-mark {
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  border-radius: 50%;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  font-size: 2.8rem;
+  font-weight: 800;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.65rem;
 }
 
 p {
-  font-size: 1.35rem;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 1.12rem;
   line-height: 1.6;
+}
+
+.choices {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
 }
 </style>

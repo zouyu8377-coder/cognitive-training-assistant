@@ -1,21 +1,22 @@
 <template>
   <PageContainer>
-    <ProgressHeader :title="`数学练习 ${currentIndex + 1}/${questions.length}`" label="慢慢来" />
+    <ProgressHeader :title="`数学练习 ${currentIndex + 1}/${questions.length}`" label="慢慢来">
+      <template #action>
+        <button type="button" :disabled="waiting" @click="skip">跳过</button>
+      </template>
+    </ProgressHeader>
     <section class="math">
       <div class="question">{{ current.expression }}</div>
       <div class="answer" :class="feedback">
-        <span>{{ answer || ' ' }}</span>
+        <span class="answer-value">{{ answer || ' ' }}</span>
         <div v-if="feedback" class="answer-feedback" role="status">
-          <strong>{{ feedback === 'correct' ? '✓' : '~' }}</strong>
+          <strong>{{ feedback === 'correct' ? '✓' : '再试试' }}</strong>
           <small>{{ feedback === 'correct' ? '答对啦！' : '差一点，下一题继续' }}</small>
         </div>
       </div>
       <LargeNumberPad @press="append" @clear="answer = ''" @backspace="backspace" />
       <p class="soft">{{ message }}</p>
-      <div class="actions">
-        <AppButton tone="quiet" :disabled="waiting" @click="skip">跳过</AppButton>
-        <AppButton :disabled="waiting" @click="next">下一题</AppButton>
-      </div>
+      <AppButton class="confirm-answer" block :disabled="waiting" @click="next">确认答案</AppButton>
     </section>
   </PageContainer>
 </template>
@@ -101,7 +102,7 @@ function skip() {
 .math {
   min-height: calc(100svh - 116px);
   display: grid;
-  grid-template-rows: minmax(86px, 0.85fr) auto auto minmax(28px, auto) auto;
+  grid-template-rows: minmax(90px, 0.8fr) auto auto minmax(24px, auto) auto;
   gap: 12px;
 }
 
@@ -110,33 +111,35 @@ function skip() {
   display: grid;
   place-items: center;
   border-radius: 8px;
-  background: #ffffff;
-  font-size: clamp(2.45rem, 12vw, 3.4rem);
+  background: transparent;
+  font-size: clamp(2.4rem, 12vw, 3.2rem);
   font-weight: 900;
 }
 
 .answer {
-  min-height: 56px;
+  min-height: 74px;
   display: grid;
   place-items: center;
-  border-bottom: 3px solid #8fb1a2;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
+  background: var(--color-surface);
   font-size: clamp(2rem, 8vw, 2.4rem);
   font-weight: 900;
 }
 
 .answer.correct,
 .answer.try-again {
-  grid-template-columns: minmax(70px, 1fr) auto;
-  padding: 5px 10px 5px 18px;
+  grid-template-columns: minmax(70px, 1fr) minmax(128px, auto);
+  padding: 6px 10px 6px 18px;
 }
 
 .answer.correct {
-  border-color: #45a66b;
+  border-color: var(--color-success);
   background: #eaf7ed;
 }
 
 .answer.try-again {
-  border-color: #e1a43a;
+  border-color: var(--color-warning);
   background: #fff5dc;
 }
 
@@ -150,13 +153,13 @@ function skip() {
 
 .answer-feedback strong {
   grid-row: 1 / 3;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 48px;
+  min-height: 48px;
   display: grid;
   place-items: center;
-  border: 3px solid currentColor;
-  border-radius: 50%;
-  font-size: 1.5rem;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
 .answer-feedback small {
@@ -173,19 +176,13 @@ function skip() {
   color: #5b6b66;
 }
 
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  position: sticky;
-  bottom: 10px;
-  padding-top: 2px;
-  background: #f7f5ef;
+.confirm-answer {
+  min-height: 58px;
 }
 
 @media (max-width: 520px) {
   .math {
-    min-height: calc(100svh - 72px);
+    min-height: calc(100svh - 80px);
     gap: 8px;
   }
 
@@ -197,8 +194,5 @@ function skip() {
     min-height: 48px;
   }
 
-  .actions {
-    bottom: 4px;
-  }
 }
 </style>

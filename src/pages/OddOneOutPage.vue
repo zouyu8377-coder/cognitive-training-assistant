@@ -9,6 +9,11 @@
             v-for="(item, index) in current.grid"
             :key="`${current.id}-${index}`"
             class="odd-item"
+            :class="{
+              selected: selectedIndex === index,
+              correct: selectedIndex === index && index === current.answerIndex,
+              gentle: selectedIndex === index && index !== current.answerIndex,
+            }"
             type="button"
             :disabled="waiting"
             @click="choose(index)"
@@ -42,6 +47,7 @@ const current = computed(() => questions[currentIndex.value]);
 const startedAt = ref(Date.now());
 const message = ref('请点一下不一样的那个。');
 const waiting = ref(false);
+const selectedIndex = ref<number>();
 
 function record(selectedIndex: number | undefined, skipped: boolean) {
   const question = current.value;
@@ -63,12 +69,14 @@ function moveOn() {
     return;
   }
   currentIndex.value = nextIndex;
+  selectedIndex.value = undefined;
   message.value = '继续找下一个。';
   startedAt.value = Date.now();
 }
 
 function choose(index: number) {
   const isCorrect = index === current.value.answerIndex;
+  selectedIndex.value = index;
   record(index, false);
   waiting.value = true;
   message.value = isCorrect ? '找对啦，很细心。' : '已经认真找了，继续试试下一题。';
@@ -97,8 +105,8 @@ h2 {
 }
 
 .odd-item {
-  min-height: 78px;
-  border: 1px solid #cad8d1;
+  min-height: 92px;
+  border: 2px solid var(--color-border);
   border-radius: 8px;
   background: #ffffff;
   color: #1689b6;
@@ -106,9 +114,27 @@ h2 {
   font-weight: 900;
 }
 
+.odd-item.selected {
+  transform: translateY(1px);
+}
+
+.odd-item.correct {
+  border-color: var(--color-success);
+  color: #226c4d;
+  background: #e8f5ed;
+}
+
+.odd-item.gentle {
+  border-color: var(--color-warning);
+  color: #8a641d;
+  background: #fff4d8;
+}
+
 .hint {
   min-height: 28px;
   margin: 0;
-  color: #52615d;
+  color: var(--color-primary);
+  text-align: center;
+  font-weight: 700;
 }
 </style>

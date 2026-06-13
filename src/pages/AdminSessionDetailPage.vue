@@ -1,5 +1,5 @@
 <template>
-  <PageContainer>
+  <PageContainer class="admin-detail-page">
     <ProgressHeader title="训练详情" label="管理员查看" />
 
     <p v-if="loading" class="state">正在加载详细记录...</p>
@@ -274,6 +274,10 @@ p {
   gap: 12px;
 }
 
+.admin-detail-page {
+  width: min(100%, 1080px);
+}
+
 .status {
   flex: 0 0 auto;
   padding: 5px 9px;
@@ -286,6 +290,7 @@ p {
 
 .question-list {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -316,6 +321,12 @@ p {
   padding: 28px 0;
   color: #64706c;
   text-align: center;
+}
+
+@media (max-width: 760px) {
+  .question-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .error {

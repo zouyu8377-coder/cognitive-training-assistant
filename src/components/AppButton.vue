@@ -21,14 +21,20 @@ withDefaults(
 
 <style scoped>
 .app-button {
-  min-height: 42px;
-  border: 0;
+  min-height: 56px;
+  border: 1px solid transparent;
   border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 0.95rem;
+  padding: 12px 18px;
+  font-size: 1rem;
   line-height: 1.35;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--shadow-button);
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.app-button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .app-button:disabled {
@@ -42,33 +48,27 @@ withDefaults(
 
 .tone-primary {
   color: #ffffff;
-  background: #2f6f61;
+  background: var(--color-primary);
 }
 
 .tone-secondary {
-  color: #213633;
-  background: #dfe9df;
+  color: var(--color-text);
+  border-color: #bfd2c9;
+  background: var(--color-primary-soft);
 }
 
 .tone-quiet {
-  color: #36504a;
-  background: transparent;
-  border: 1px solid #c8d5cc;
+  color: var(--color-text);
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  box-shadow: none;
 }
 
 @media (max-width: 520px) {
   .app-button {
-    min-height: 40px;
-    padding: 8px 12px;
-    font-size: 0.94rem;
-  }
-}
-
-@media (max-width: 520px) {
-  .app-button {
-    min-height: 36px;
-    padding: 6px 8px;
-    font-size: 0.88rem;
+    min-height: 54px;
+    padding: 11px 14px;
+    font-size: 0.98rem;
   }
 }
 </style>
