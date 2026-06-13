@@ -2,6 +2,14 @@
   <PageContainer>
     <ProgressHeader title="今日训练" label="准备开始" />
     <section class="stack">
+      <ResultCard class="cloud-card" :class="cloudStatus">
+        <h2>云端记录</h2>
+        <p>{{ cloudMessage }}</p>
+        <RouterLink v-if="cloudStatus !== 'ready'" to="/setup">
+          <AppButton tone="quiet" block>{{ cloudStatus === 'disabled' ? '开启云端记录' : '重新检查连接' }}</AppButton>
+        </RouterLink>
+      </ResultCard>
+
       <ResultCard>
         <h2>{{ store.state.settings.patientNickname || '家人' }}，今天有这些练习</h2>
         <ul>
@@ -52,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppButton from '../components/AppButton.vue';
 import PageContainer from '../components/PageContainer.vue';
@@ -64,16 +72,33 @@ import { todayKey } from '../utils/date';
 import { preTrainingStatusText } from '../utils/sessionInsights';
 import { loadSessions } from '../utils/storage';
 import { nextTaskRoute } from '../utils/trainingFlow';
+import { prepareCloudTracking, type CloudConnectionStatus } from '../services/cloudTracking';
 
 const router = useRouter();
 const store = useTrainingStore();
 const preStatus = ref<PreTrainingStatus>('steady');
 const confirmStartNew = ref(false);
+const cloudStatus = ref<CloudConnectionStatus>(
+  store.state.settings.cloudTrackingConsent ? 'pending' : 'disabled',
+);
+const cloudMessage = ref(
+  store.state.settings.cloudTrackingConsent
+    ? '正在检查云端连接...'
+    : '云端记录未开启，管理员无法看到本次练习。',
+);
 const todaySessions = loadSessions().filter((session) => session.date === todayKey());
 const statusOptions = (Object.keys(preTrainingStatusText) as PreTrainingStatus[]).map((value) => ({
   value,
   label: preTrainingStatusText[value],
 }));
+
+onMounted(refreshCloudStatus);
+
+async function refreshCloudStatus() {
+  const result = await prepareCloudTracking(store.state.settings.patientNickname);
+  cloudStatus.value = result.status;
+  cloudMessage.value = result.message;
+}
 
 function start() {
   if (store.state.currentSession) {
@@ -152,5 +177,24 @@ li {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+.cloud-card {
+  border-color: #dbc98e;
+}
+
+.cloud-card.ready {
+  border-color: #9fc9ad;
+  background: #f1f8f3;
+}
+
+.cloud-card.pending,
+.cloud-card.disabled {
+  background: #fff9e9;
+}
+
+.cloud-card p {
+  margin: 0 0 12px;
+  line-height: 1.55;
 }
 </style>

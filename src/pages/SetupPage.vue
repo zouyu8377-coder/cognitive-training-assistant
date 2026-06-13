@@ -44,10 +44,13 @@
       </label>
       <label class="check consent">
         <input v-model="form.cloudTrackingConsent" type="checkbox" />
-        <span>允许上传患者昵称、练习过程和完成情况，供项目管理员了解试用情况</span>
+        <span>允许上传训练记录，让项目管理员可以在其他设备查看使用情况</span>
       </label>
+      <p v-if="cloudMessage" class="cloud-message" :class="cloudStatus" role="status">{{ cloudMessage }}</p>
       <p class="muted">默认设置偏低压力，优先帮助完成和保持参与意愿。</p>
-      <AppButton type="submit" block>保存并查看今日训练</AppButton>
+      <AppButton type="submit" block :disabled="saving">
+        {{ saving ? '正在检查云端连接...' : '保存并查看今日训练' }}
+      </AppButton>
       <p class="privacy-note">
         启用云端记录后，患者昵称、练习过程和完成情况会安全上传，供本项目管理员了解试用情况。
       </p>
@@ -56,24 +59,36 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppButton from '../components/AppButton.vue';
 import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import { useTrainingStore } from '../stores/trainingStore';
 import type { TrainingSettings } from '../types';
+import { prepareCloudTracking } from '../services/cloudTracking';
 
 const router = useRouter();
 const store = useTrainingStore();
 const form = reactive<TrainingSettings>({ ...store.state.settings });
+const saving = ref(false);
+const cloudStatus = ref<'ready' | 'pending' | 'disabled'>('disabled');
+const cloudMessage = ref('');
 
-function save() {
-  store.updateSettings({
+async function save() {
+  if (saving.value) return;
+  saving.value = true;
+  const settings = {
     ...form,
     patientNickname: form.patientNickname.trim() || '家人',
     includeSubtraction: ['L2', 'L4', 'L5', 'L6'].includes(form.mathLevel),
-  });
+  };
+  store.updateSettings(settings);
+  const result = await prepareCloudTracking(settings.patientNickname);
+  cloudStatus.value = result.status;
+  cloudMessage.value = result.message;
+  saving.value = false;
+  if (result.status === 'pending' && settings.cloudTrackingConsent) return;
   router.push('/today');
 }
 </script>
@@ -117,5 +132,24 @@ select {
   background: #ffffff;
   font-weight: 700;
   line-height: 1.5;
+}
+
+.cloud-message {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.cloud-message.ready {
+  color: #245f48;
+  background: #e7f3ea;
+}
+
+.cloud-message.pending,
+.cloud-message.disabled {
+  color: #735a1d;
+  background: #fff4d8;
 }
 </style>

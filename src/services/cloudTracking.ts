@@ -21,6 +21,25 @@ interface QueueItem {
 }
 
 export type CloudSyncResult = 'synced' | 'queued' | 'disabled';
+export type CloudConnectionStatus = 'ready' | 'pending' | 'disabled';
+
+export interface CloudConnectionResult {
+  status: CloudConnectionStatus;
+  message: string;
+}
+
+function cloudErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  if (error && typeof error === 'object') {
+    const value = error as { message?: unknown; code?: unknown; details?: unknown };
+    const parts = [value.message, value.code, value.details].filter(
+      (item): item is string => typeof item === 'string' && item.length > 0,
+    );
+    if (parts.length) return parts.join(' / ');
+  }
+  return '未知错误';
+}
 
 export interface AdminPatient {
   id: string;
@@ -83,7 +102,10 @@ function hasTrackingConsent(): boolean {
   }
 }
 
-async function ensureAnonymousUser(): Promise<User | undefined> {
+let activeAnonymousUserRequest: Promise<User | undefined> | undefined;
+let activePatientRequest: Promise<string | undefined> | undefined;
+
+async function createAnonymousUser(): Promise<User | undefined> {
   if (!supabase) return undefined;
   const { data } = await supabase.auth.getSession();
   if (data.session?.user && data.session.user.is_anonymous) return data.session.user;
@@ -94,7 +116,17 @@ async function ensureAnonymousUser(): Promise<User | undefined> {
   return signInData.user ?? undefined;
 }
 
-async function ensurePatient(nickname: string): Promise<string | undefined> {
+async function ensureAnonymousUser(): Promise<User | undefined> {
+  if (activeAnonymousUserRequest) return activeAnonymousUserRequest;
+  activeAnonymousUserRequest = createAnonymousUser();
+  try {
+    return await activeAnonymousUserRequest;
+  } finally {
+    activeAnonymousUserRequest = undefined;
+  }
+}
+
+async function createPatient(nickname: string): Promise<string | undefined> {
   if (!supabase) return undefined;
   const user = await ensureAnonymousUser();
   if (!user) return undefined;
@@ -140,6 +172,49 @@ async function ensurePatient(nickname: string): Promise<string | undefined> {
   if (error) throw error;
   localStorage.setItem(PATIENT_ID_KEY, data.id);
   return data.id;
+}
+
+async function ensurePatient(nickname: string): Promise<string | undefined> {
+  if (activePatientRequest) return activePatientRequest;
+  activePatientRequest = createPatient(nickname);
+  try {
+    return await activePatientRequest;
+  } finally {
+    activePatientRequest = undefined;
+  }
+}
+
+export async function prepareCloudTracking(nickname: string): Promise<CloudConnectionResult> {
+  if (!hasTrackingConsent()) {
+    return {
+      status: 'disabled',
+      message: '云端记录未开启，管理员无法看到本次练习。',
+    };
+  }
+  if (!isCloudConfigured || !supabase) {
+    return {
+      status: 'pending',
+      message: '云端服务尚未配置，本次记录只能保存在当前设备。',
+    };
+  }
+  if (!navigator.onLine) {
+    return {
+      status: 'pending',
+      message: '当前网络不可用，记录会先保存在设备中，联网后自动补传。',
+    };
+  }
+
+  try {
+    const patientId = await ensurePatient(nickname);
+    return patientId
+      ? { status: 'ready', message: '云端记录已连接，管理员可以看到训练记录。' }
+      : { status: 'pending', message: '云端身份尚未建立，记录会稍后自动重试。' };
+  } catch (error) {
+    return {
+      status: 'pending',
+      message: `云端连接失败：${cloudErrorMessage(error)}。记录会稍后自动重试。`,
+    };
+  }
 }
 
 function sessionPayload(session: TrainingSession, patientId: string): Record<string, unknown> {

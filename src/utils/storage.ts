@@ -29,6 +29,10 @@ export function saveSettings(settings: TrainingSettings): void {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
+export function hasSavedSettings(): boolean {
+  return localStorage.getItem(SETTINGS_KEY) !== null;
+}
+
 export function loadSessions(): TrainingSession[] {
   const raw = localStorage.getItem(SESSIONS_KEY);
   if (!raw) return [];
