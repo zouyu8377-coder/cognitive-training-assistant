@@ -41,8 +41,9 @@ button:active {
 }
 
 .utility {
-  color: var(--color-muted);
+  color: var(--color-text);
   background: #edf1ed;
-  font-size: 0.88rem;
+  font-size: clamp(1.12rem, 4.8vw, 1.25rem);
+  font-weight: 900;
 }
 </style>

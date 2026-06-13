@@ -50,6 +50,12 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+button {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,

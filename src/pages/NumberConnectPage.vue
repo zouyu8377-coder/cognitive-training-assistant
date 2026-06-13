@@ -1,7 +1,11 @@
 <template>
   <PageContainer>
-    <ProgressHeader title="数字顺序练习" :label="orderLabel" />
+    <ProgressHeader title="数字顺序练习" label="按顺序点击数字" />
     <section class="number-task">
+      <div class="order-instruction">
+        <span aria-hidden="true">{{ order === 'ascending' ? '↑' : '↓' }}</span>
+        <strong>{{ orderLabel }}</strong>
+      </div>
       <div class="board">
         <button
           v-for="dot in dots"
@@ -100,8 +104,37 @@ function tap(value: number) {
 .number-task {
   min-height: calc(100svh - 116px);
   display: grid;
-  grid-template-rows: minmax(300px, 1fr) minmax(30px, auto) auto;
+  grid-template-rows: auto minmax(300px, 1fr) minmax(40px, auto) auto;
   gap: 12px;
+}
+
+.order-instruction {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 2px solid #a9cbbc;
+  border-radius: 8px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.order-instruction span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffffff;
+  background: var(--color-primary);
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.order-instruction strong {
+  font-size: 1.3rem;
 }
 
 .board {
@@ -133,9 +166,11 @@ function tap(value: number) {
 }
 
 .hint {
-  min-height: 30px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
   margin: 0;
-  font-size: 1.08rem;
+  font-size: 1.25rem;
   color: var(--color-primary);
   text-align: center;
 }
@@ -148,9 +183,21 @@ function tap(value: number) {
 
 @media (max-width: 520px) {
   .number-task {
-    min-height: calc(100svh - 72px);
-    grid-template-rows: minmax(260px, 1fr) minmax(28px, auto) auto;
+    min-height: calc(100svh - 80px);
+    grid-template-rows: auto minmax(220px, 1fr) minmax(38px, auto) auto;
     gap: 8px;
+  }
+
+  .order-instruction {
+    min-height: 52px;
+  }
+
+  .order-instruction strong {
+    font-size: 1.18rem;
+  }
+
+  .hint {
+    font-size: 1.15rem;
   }
 
   .actions {
