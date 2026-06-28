@@ -59,15 +59,17 @@ function completeWriting() {
 
 <style scoped>
 .drawing-page {
-  height: 100svh;
-  overflow: hidden;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .task {
-  height: calc(100svh - 92px);
+  min-height: calc(100dvh - 92px);
   min-height: 0;
   display: grid;
-  grid-template-rows: auto minmax(280px, 1fr) auto auto;
+  grid-template-rows: auto minmax(300px, 1fr) auto auto;
   gap: 10px;
 }
 
@@ -84,10 +86,14 @@ p {
 }
 
 .writing-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  padding-bottom: max(2px, env(safe-area-inset-bottom));
+  padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+  background: var(--color-background);
 }
 
 .writing-actions :deep(.app-button) {
@@ -97,8 +103,8 @@ p {
 
 @media (max-width: 520px) {
   .task {
-    height: calc(100svh - 72px);
-    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    min-height: calc(100dvh - 72px);
+    grid-template-rows: auto minmax(300px, 1fr) auto auto;
     gap: 8px;
   }
 

@@ -17,6 +17,7 @@
           :class="{ 'image-hidden': imageLoading }"
           :kind="current.icon"
           :label="current.name"
+          fit-parent
           @load="imageReady"
           @error="imageFailed"
         />
@@ -120,15 +121,17 @@ function imageFailed() {
 
 <style scoped>
 .drawing-page {
-  height: 100svh;
-  overflow: hidden;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .drawing-task {
-  height: calc(100svh - 92px);
+  min-height: calc(100dvh - 92px);
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(100px, 24svh) minmax(230px, 1fr) auto auto;
+  grid-template-rows: minmax(108px, 23dvh) minmax(240px, 1fr) auto auto;
   gap: 10px;
 }
 
@@ -141,14 +144,12 @@ function imageFailed() {
   overflow: hidden;
 }
 
-.image-stage :deep(.object-image),
-.image-stage :deep(.line-art) {
+.image-stage :deep(.object-image.fit-parent),
+.image-stage :deep(.line-art.fit-parent) {
   position: absolute;
   inset: 10px;
   width: calc(100% - 20px);
   height: calc(100% - 20px);
-  max-width: none;
-  max-height: none;
   object-fit: contain;
 }
 
@@ -178,17 +179,22 @@ function imageFailed() {
 }
 
 .hint {
-  min-height: 24px;
+  min-height: 22px;
   margin: 0;
   color: #52615d;
   text-align: center;
+  font-size: clamp(0.92rem, 4vw, 1.25rem);
+  line-height: 1.35;
 }
 
 .primary-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  padding-bottom: max(2px, env(safe-area-inset-bottom));
+  padding: 6px 0 max(6px, env(safe-area-inset-bottom));
   background: var(--color-background);
 }
 
@@ -205,8 +211,8 @@ function imageFailed() {
 
 @media (max-width: 520px) {
   .drawing-task {
-    height: calc(100svh - 72px);
-    grid-template-rows: minmax(88px, 20svh) minmax(0, 1fr) auto auto;
+    min-height: calc(100dvh - 72px);
+    grid-template-rows: minmax(96px, 19dvh) minmax(260px, 1fr) auto auto;
     gap: 8px;
   }
 
@@ -215,8 +221,8 @@ function imageFailed() {
   }
 
   .hint {
-    min-height: 18px;
-    font-size: 0.86rem;
+    min-height: 0;
+    font-size: clamp(0.9rem, 4.6vw, 1.2rem);
   }
 }
 </style>

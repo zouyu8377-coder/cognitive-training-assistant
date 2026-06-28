@@ -1,6 +1,14 @@
 <template>
-  <img v-if="isImage" class="object-image" :src="displayKind" :alt="label" @load="emit('load')" @error="handleError" />
-  <svg v-else class="line-art" viewBox="0 0 160 130" role="img" :aria-label="label">
+  <img
+    v-if="isImage"
+    class="object-image"
+    :class="{ 'fit-parent': fitParent }"
+    :src="displayKind"
+    :alt="label"
+    @load="emit('load')"
+    @error="handleError"
+  />
+  <svg v-else class="line-art" :class="{ 'fit-parent': fitParent }" viewBox="0 0 160 130" role="img" :aria-label="label">
     <g v-if="kind === 'zebra'" fill="none" stroke="#26312f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M29 73c6-25 35-39 70-31 15 4 25 11 31 22 8 16-1 34-22 42-29 12-69 6-82-15-4-6-4-12 3-18z" />
       <path d="M123 55c11-13 28-7 30 7 3 14-8 25-21 21M136 51l3-17M147 55l11-10" />
@@ -57,7 +65,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 
-const props = defineProps<{ kind: string; label: string }>();
+const props = withDefaults(defineProps<{ kind: string; label: string; fitParent?: boolean }>(), {
+  fitParent: false,
+});
 const emit = defineEmits<{ load: []; error: [] }>();
 const isImage = computed(() => /\.(jpe?g|png|webp|gif|svg)$/i.test(props.kind));
 const displayKind = ref(props.kind);
@@ -102,6 +112,15 @@ onMounted(() => {
   max-height: 260px;
   display: block;
   margin: 0 auto;
+  object-fit: contain;
+}
+
+.fit-parent {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: auto;
   object-fit: contain;
 }
 

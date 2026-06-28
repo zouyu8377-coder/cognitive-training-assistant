@@ -128,9 +128,9 @@ onMounted(() => {
 }
 
 .draw-toolbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   min-height: 46px;
   padding: 8px 10px 8px 14px;
@@ -140,11 +140,14 @@ onMounted(() => {
 
 .draw-toolbar strong {
   color: #2d5149;
+  line-height: 1.2;
 }
 
 .draw-toolbar span {
   color: #64706c;
-  font-size: 0.84rem;
+  font-size: clamp(0.82rem, 3.7vw, 1rem);
+  line-height: 1.25;
+  text-align: right;
 }
 
 canvas {
@@ -161,6 +164,7 @@ canvas {
   .draw-toolbar {
     min-height: 40px;
     padding: 6px 10px;
+    gap: 8px;
   }
 
   canvas {

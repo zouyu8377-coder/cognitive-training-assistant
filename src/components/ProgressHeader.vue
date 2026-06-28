@@ -52,6 +52,7 @@ function goBack() {
   background: transparent;
   color: var(--color-muted);
   font-weight: 700;
+  font-size: clamp(1rem, 4.6vw, 1.35rem);
 }
 
 .back {
@@ -73,7 +74,8 @@ p {
 }
 
 strong {
-  font-size: 1.2rem;
+  font-size: clamp(1.05rem, 5.2vw, 1.6rem);
+  line-height: 1.2;
 }
 
 @media (max-width: 520px) {
@@ -99,7 +101,7 @@ strong {
   }
 
   strong {
-    font-size: 1.05rem;
+    font-size: clamp(1.02rem, 6vw, 1.45rem);
   }
 }
 

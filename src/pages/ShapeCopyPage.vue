@@ -10,7 +10,7 @@
       <ResultCard class="reference-stage">
         <h2>{{ task.referenceImageUrl ? '请照着图片画一遍' : `请照着画一个${task.shapeName}` }}</h2>
         <div class="reference-art">
-          <LineArt :kind="task.referenceImageUrl ?? task.shapeKind" :label="task.shapeName" />
+          <LineArt :kind="task.referenceImageUrl ?? task.shapeKind" :label="task.shapeName" fit-parent />
         </div>
       </ResultCard>
 
@@ -114,15 +114,17 @@ function skip() {
 
 <style scoped>
 .drawing-page {
-  height: 100svh;
-  overflow: hidden;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .drawing-task {
-  height: calc(100svh - 92px);
+  min-height: calc(100dvh - 92px);
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(112px, 25svh) minmax(230px, 1fr) auto auto;
+  grid-template-rows: auto minmax(240px, 1fr) auto auto;
   gap: 10px;
 }
 
@@ -138,38 +140,36 @@ function skip() {
 
 .reference-art {
   width: 100%;
-  height: 100%;
+  height: clamp(92px, 14dvh, 150px);
   min-height: 0;
   display: grid;
   place-items: center;
 }
 
-.reference-art :deep(.object-image),
-.reference-art :deep(.line-art) {
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  object-fit: contain;
-}
-
 h2 {
   margin: 0;
   text-align: center;
+  font-size: clamp(1rem, 5vw, 1.8rem);
+  line-height: 1.25;
 }
 
 .hint {
-  min-height: 24px;
+  min-height: 22px;
   margin: 0;
   color: #52615d;
   text-align: center;
+  font-size: clamp(0.92rem, 4vw, 1.25rem);
+  line-height: 1.35;
 }
 
 .primary-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  padding-bottom: max(2px, env(safe-area-inset-bottom));
+  padding: 6px 0 max(6px, env(safe-area-inset-bottom));
   background: var(--color-background);
 }
 
@@ -180,18 +180,18 @@ h2 {
 
 @media (max-width: 520px) {
   .drawing-task {
-    height: calc(100svh - 72px);
-    grid-template-rows: minmax(96px, 21svh) minmax(0, 1fr) auto auto;
+    min-height: calc(100dvh - 72px);
+    grid-template-rows: auto minmax(260px, 1fr) auto auto;
     gap: 6px;
   }
 
   h2 {
-    font-size: 1rem;
+    font-size: clamp(1rem, 6vw, 1.55rem);
   }
 
   .hint {
-    min-height: 18px;
-    font-size: 0.86rem;
+    min-height: 0;
+    font-size: clamp(0.9rem, 4.6vw, 1.2rem);
   }
 
   .primary-actions {
