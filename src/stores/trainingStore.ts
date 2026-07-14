@@ -30,6 +30,7 @@ import {
   normalizeVisualAssetUrls,
 } from '../utils/visualTraining';
 import { syncTrainingSession, trackActivity } from '../services/cloudTracking';
+import { preloadTrainingImages } from '../utils/imagePreloader';
 
 interface TrainingState {
   settings: TrainingSettings;
@@ -51,6 +52,7 @@ export function useTrainingStore() {
     if (!session.shapeCopyTask) session.shapeCopyTask = generateShapeCopyTask();
     if (!session.oddOneOutQuestions?.length) session.oddOneOutQuestions = generateOddOneOutQuestions();
     normalizeVisualAssetUrls(session);
+    preloadTrainingImages(session);
   }
 
   function updateSettings(settings: TrainingSettings) {
@@ -82,6 +84,7 @@ export function useTrainingStore() {
       oddOneOutQuestions: generateOddOneOutQuestions(),
     };
     persistDraft();
+    preloadTrainingImages(state.currentSession);
     void syncTrainingSession(state.currentSession);
     void trackActivity('training_started', state.currentSession.patientNickname, state.currentSession, {
       preTrainingStatus,

@@ -22,13 +22,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppButton from '../components/AppButton.vue';
 import LargeNumberPad from '../components/LargeNumberPad.vue';
 import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import { useTrainingStore } from '../stores/trainingStore';
+import { preloadTrainingImages } from '../utils/imagePreloader';
 import { firstPendingMathIndex, nextTaskRoute } from '../utils/trainingFlow';
 
 const router = useRouter();
@@ -42,6 +43,10 @@ const message = ref('输入答案后点下一题。');
 const waiting = ref(false);
 const feedback = ref<'' | 'correct' | 'try-again'>('');
 const current = computed(() => questions[currentIndex.value]);
+
+onMounted(() => {
+  preloadTrainingImages(session);
+});
 
 function append(value: number) {
   if (waiting.value) return;
