@@ -15,21 +15,19 @@
         <label>
         单次数学题数量
         <select v-model.number="form.mathQuestionCount">
-          <option :value="5">5 题</option>
           <option :value="10">10 题</option>
-          <option :value="15">15 题</option>
           <option :value="20">20 题</option>
+          <option :value="30">30 题</option>
         </select>
         </label>
         <label>
         数学难度
         <select v-model="form.mathLevel">
-          <option value="L1">简单：10 以内加法</option>
-          <option value="L2">简单：10 以内加减</option>
-          <option value="L3">中等：20 以内加法</option>
-          <option value="L4">中等：20 以内加减</option>
-          <option value="L5">困难：100 以内简单加减</option>
-          <option value="L6">困难：100 以内进退位加减</option>
+          <option value="L1">难度 1：简单加减各一半</option>
+          <option value="L2">难度 2：少量困难题</option>
+          <option value="L3">难度 3：困难加法增加</option>
+          <option value="L4">难度 4：困难加减更均衡</option>
+          <option value="L5">难度 5：四类题均衡混合</option>
         </select>
         </label>
       </section>
@@ -93,7 +91,7 @@ async function save() {
     ...form,
     cloudTrackingConsent: true,
     patientNickname: form.patientNickname.trim() || '家人',
-    includeSubtraction: ['L2', 'L4', 'L5', 'L6'].includes(form.mathLevel),
+    includeSubtraction: true,
   };
   store.updateSettings(settings);
   const result = await prepareCloudTracking(settings.patientNickname);

@@ -1,5 +1,5 @@
 <template>
-  <button class="app-button" :class="[`tone-${tone}`, { block }]" :type="type">
+  <button class="app-button" :class="[`tone-${tone}`, { block }]" :type="type" :disabled="disabled">
     <slot />
   </button>
 </template>
@@ -9,11 +9,13 @@ withDefaults(
   defineProps<{
     tone?: 'primary' | 'secondary' | 'quiet';
     block?: boolean;
+    disabled?: boolean;
     type?: 'button' | 'submit';
   }>(),
   {
     tone: 'primary',
     block: false,
+    disabled: false,
     type: 'button',
   },
 );

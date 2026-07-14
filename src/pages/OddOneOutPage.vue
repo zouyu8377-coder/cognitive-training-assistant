@@ -75,6 +75,7 @@ function moveOn() {
 }
 
 function choose(index: number) {
+  if (waiting.value || selectedIndex.value !== undefined) return;
   const isCorrect = index === current.value.answerIndex;
   selectedIndex.value = index;
   record(index, false);
@@ -87,6 +88,7 @@ function choose(index: number) {
 }
 
 function skip() {
+  if (waiting.value) return;
   record(undefined, true);
   moveOn();
 }

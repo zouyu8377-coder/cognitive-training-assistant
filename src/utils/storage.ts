@@ -8,7 +8,7 @@ export const defaultSettings: TrainingSettings = {
   patientNickname: '家人',
   cloudTrackingConsent: true,
   mathQuestionCount: 10,
-  mathLevel: 'L4',
+  mathLevel: 'L1',
   includeSubtraction: true,
   numberConnectLevel: 10,
   includeWritingTask: true,
@@ -19,14 +19,14 @@ export function loadSettings(): TrainingSettings {
   const raw = localStorage.getItem(SETTINGS_KEY);
   if (!raw) return defaultSettings;
   try {
-    return { ...defaultSettings, ...JSON.parse(raw), cloudTrackingConsent: true };
+    return normalizeSettings({ ...defaultSettings, ...JSON.parse(raw), cloudTrackingConsent: true });
   } catch {
     return defaultSettings;
   }
 }
 
 export function saveSettings(settings: TrainingSettings): void {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...settings, cloudTrackingConsent: true }));
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(normalizeSettings({ ...settings, cloudTrackingConsent: true })));
 }
 
 export function hasSavedSettings(): boolean {
@@ -81,4 +81,17 @@ function sessionTime(session: TrainingSession): number {
 
 function normalizeDailySessions(sessions: TrainingSession[]): TrainingSession[] {
   return [...sessions].sort((a, b) => sessionTime(b) - sessionTime(a));
+}
+
+function normalizeSettings(settings: TrainingSettings): TrainingSettings {
+  const count = [10, 20, 30].includes(settings.mathQuestionCount) ? settings.mathQuestionCount : 10;
+  const level = ['L1', 'L2', 'L3', 'L4', 'L5'].includes(settings.mathLevel) ? settings.mathLevel : 'L5';
+
+  return {
+    ...settings,
+    cloudTrackingConsent: true,
+    includeSubtraction: true,
+    mathQuestionCount: count as TrainingSettings['mathQuestionCount'],
+    mathLevel: level as TrainingSettings['mathLevel'],
+  };
 }
