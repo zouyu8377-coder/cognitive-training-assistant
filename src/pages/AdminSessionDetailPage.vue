@@ -129,6 +129,7 @@ import type { MathQuestion, ObjectNamingQuestion, OddOneOutQuestion, TrainingSes
 import { formatDuration } from '../utils/date';
 import { bestShapeAttempt as getBestShapeAttempt } from '../utils/drawingEvaluation';
 import { buildNextTrainingSuggestions, patientMoodText, preTrainingStatusText } from '../utils/sessionInsights';
+import { oddOneOutChoiceLabel } from '../utils/visualTraining';
 
 const route = useRoute();
 const router = useRouter();
@@ -231,7 +232,7 @@ function objectiveStatusText(isCorrect?: boolean, skipped?: boolean): string {
 
 function selectedOddAnswer(question: OddOneOutQuestion): string {
   if (question.selectedIndex === undefined) return '暂未作答';
-  return `第 ${question.selectedIndex + 1} 个（${question.grid[question.selectedIndex] ?? '未记录'}）`;
+  return `第 ${question.selectedIndex + 1} 个（${oddOneOutChoiceLabel(question, question.selectedIndex)}）`;
 }
 
 function objectInputText(method?: ObjectNamingQuestion['inputMethod']): string {

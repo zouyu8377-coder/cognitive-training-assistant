@@ -102,6 +102,7 @@ export interface OddOneOutQuestion {
   itemLabel: string;
   oddLabel: string;
   grid: string[];
+  contentType?: 'text' | 'image';
   answerIndex: number;
   selectedIndex?: number;
   isCorrect?: boolean;

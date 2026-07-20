@@ -90,7 +90,7 @@
           <div v-for="(question, index) in session.oddOneOutQuestions ?? []" :key="question.id" class="question-row">
             <strong>第 {{ index + 1 }} 题：{{ question.prompt }}</strong>
             <span>正确答案：第 {{ question.answerIndex + 1 }} 个（{{ question.oddLabel }}）</span>
-            <span>选择：{{ question.selectedIndex === undefined ? '暂未作答' : `第 ${question.selectedIndex + 1} 个（${question.grid[question.selectedIndex]}）` }}</span>
+            <span>选择：{{ selectedOddAnswer(question) }}</span>
             <span>情况：{{ objectiveStatusText(question.isCorrect, question.skipped) }}</span>
             <span>用时：{{ formatDuration(question.timeSpentSeconds) }}</span>
           </div>
@@ -141,11 +141,12 @@ import PageContainer from '../components/PageContainer.vue';
 import ProgressHeader from '../components/ProgressHeader.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { useTrainingStore } from '../stores/trainingStore';
-import type { MathQuestion, ObjectNamingQuestion, PatientMood, TrainingSession } from '../types';
+import type { MathQuestion, ObjectNamingQuestion, OddOneOutQuestion, PatientMood, TrainingSession } from '../types';
 import { formatDuration } from '../utils/date';
 import { bestShapeAttempt as getBestShapeAttempt } from '../utils/drawingEvaluation';
 import { buildNextTrainingSuggestions, patientMoodText, preTrainingStatusText } from '../utils/sessionInsights';
 import { findSession } from '../utils/storage';
+import { oddOneOutChoiceLabel } from '../utils/visualTraining';
 
 const route = useRoute();
 const router = useRouter();
@@ -156,6 +157,11 @@ const isHistoryDetail = Boolean(route.params.id);
 const isEditing = ref(!isHistoryDetail);
 const mood = ref<PatientMood>(session.value?.patientMood ?? 'calm');
 const note = ref(session.value?.caregiverNote ?? '');
+
+function selectedOddAnswer(question: OddOneOutQuestion): string {
+  if (question.selectedIndex === undefined) return '暂未作答';
+  return `第 ${question.selectedIndex + 1} 个（${oddOneOutChoiceLabel(question, question.selectedIndex)}）`;
+}
 
 const answeredMath = computed(() => session.value?.mathQuestions.filter((q) => !q.skipped).length ?? 0);
 const correctMath = computed(() => session.value?.mathQuestions.filter((q) => q.isCorrect).length ?? 0);

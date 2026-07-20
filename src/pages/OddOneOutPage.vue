@@ -18,7 +18,8 @@
             :disabled="waiting"
             @click="choose(index)"
           >
-            {{ item }}
+            <img v-if="current.contentType === 'image'" :src="item" alt="" draggable="false" />
+            <span v-else>{{ item }}</span>
           </button>
         </div>
       </ResultCard>
@@ -107,13 +108,27 @@ h2 {
 }
 
 .odd-item {
+  min-width: 0;
   min-height: 92px;
+  aspect-ratio: 1;
+  padding: 5px;
   border: 2px solid var(--color-border);
   border-radius: 8px;
   background: #ffffff;
   color: #1689b6;
   font-size: 2rem;
   font-weight: 900;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+.odd-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 .odd-item.selected {

@@ -27,6 +27,7 @@ import {
   generateObjectNamingQuestions,
   generateOddOneOutQuestions,
   generateShapeCopyTask,
+  isImageOddOneOutQuestion,
   normalizeVisualAssetUrls,
 } from '../utils/visualTraining';
 import { syncTrainingSession, trackActivity } from '../services/cloudTracking';
@@ -50,7 +51,12 @@ export function useTrainingStore() {
   function ensureVisualTasks(session: TrainingSession) {
     if (!session.objectNamingQuestions?.length) session.objectNamingQuestions = generateObjectNamingQuestions();
     if (!session.shapeCopyTask) session.shapeCopyTask = generateShapeCopyTask();
-    if (!session.oddOneOutQuestions?.length) session.oddOneOutQuestions = generateOddOneOutQuestions();
+    if (
+      !session.oddOneOutQuestions?.length ||
+      session.oddOneOutQuestions.some((question) => !isImageOddOneOutQuestion(question))
+    ) {
+      session.oddOneOutQuestions = generateOddOneOutQuestions();
+    }
     normalizeVisualAssetUrls(session);
     preloadTrainingImages(session);
   }

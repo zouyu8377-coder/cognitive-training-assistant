@@ -2,6 +2,7 @@ import type { ObjectNamingQuestion, OddOneOutQuestion, ShapeCopyTask, TrainingSe
 
 const objectImageBase = `${import.meta.env.BASE_URL}object-images/`;
 const shapeCopyImageBase = `${import.meta.env.BASE_URL}shape-copy-images/`;
+const oddOneOutImageBase = `${import.meta.env.BASE_URL}odd-one-out-images/`;
 
 const objectItems = [
   { name: 'T恤', icon: `${objectImageBase}object-001.webp` },
@@ -102,6 +103,57 @@ const objectItems = [
   { name: '鸭子', icon: `${objectImageBase}object-096.webp` },
   { name: '鹅', icon: `${objectImageBase}object-097.webp` },
   { name: '鹦鹉', icon: `${objectImageBase}object-098.webp` },
+  { name: '书桌', icon: `${objectImageBase}object-099.webp` },
+  { name: '冰淇淋', icon: `${objectImageBase}object-100.webp` },
+  { name: '凳子', icon: `${objectImageBase}object-101.webp` },
+  { name: '凳子', icon: `${objectImageBase}object-102.webp` },
+  { name: '吹风机', icon: `${objectImageBase}object-103.webp` },
+  { name: '塔吊', icon: `${objectImageBase}object-104.webp` },
+  { name: '大萝卜', icon: `${objectImageBase}object-105.webp` },
+  { name: '姜', icon: `${objectImageBase}object-106.webp` },
+  { name: '小桥', icon: `${objectImageBase}object-107.webp` },
+  { name: '小麦', icon: `${objectImageBase}object-108.webp` },
+  { name: '帽子', icon: `${objectImageBase}object-109.webp` },
+  { name: '床', icon: `${objectImageBase}object-110.webp` },
+  { name: '扇子', icon: `${objectImageBase}object-111.webp` },
+  { name: '扇贝', icon: `${objectImageBase}object-112.webp` },
+  { name: '手表', icon: `${objectImageBase}object-113.webp` },
+  { name: '打火机', icon: `${objectImageBase}object-114.webp` },
+  { name: '指南针', icon: `${objectImageBase}object-115.webp` },
+  { name: '梳子', icon: `${objectImageBase}object-116.webp` },
+  { name: '棒球帽', icon: `${objectImageBase}object-117.webp` },
+  { name: '椰子树', icon: `${objectImageBase}object-118.webp` },
+  { name: '水龙头', icon: `${objectImageBase}object-119.webp` },
+  { name: '汉堡包', icon: `${objectImageBase}object-120.webp` },
+  { name: '沙发', icon: `${objectImageBase}object-121.webp` },
+  { name: '洋葱', icon: `${objectImageBase}object-122.webp` },
+  { name: '洗衣机', icon: `${objectImageBase}object-123.webp` },
+  { name: '海螺', icon: `${objectImageBase}object-124.webp` },
+  { name: '游泳圈', icon: `${objectImageBase}object-125.webp` },
+  { name: '滑梯', icon: `${objectImageBase}object-126.webp` },
+  { name: '灯笼', icon: `${objectImageBase}object-127.webp` },
+  { name: '照相机', icon: `${objectImageBase}object-128.webp` },
+  { name: '牡丹', icon: `${objectImageBase}object-129.webp` },
+  { name: '牵牛花', icon: `${objectImageBase}object-130.webp` },
+  { name: '玉米', icon: `${objectImageBase}object-131.webp` },
+  { name: '电脑', icon: `${objectImageBase}object-132.webp` },
+  { name: '眼镜', icon: `${objectImageBase}object-133.webp` },
+  { name: '秋千', icon: `${objectImageBase}object-134.webp` },
+  { name: '竹子', icon: `${objectImageBase}object-135.webp` },
+  { name: '竹笋', icon: `${objectImageBase}object-136.webp` },
+  { name: '箩筐', icon: `${objectImageBase}object-137.webp` },
+  { name: '荷花', icon: `${objectImageBase}object-138.webp` },
+  { name: '轮椅', icon: `${objectImageBase}object-139.webp` },
+  { name: '辣椒', icon: `${objectImageBase}object-140.webp` },
+  { name: '钥匙', icon: `${objectImageBase}object-141.webp` },
+  { name: '铁锹', icon: `${objectImageBase}object-142.webp` },
+  { name: '长城', icon: `${objectImageBase}object-143.webp` },
+  { name: '闹钟', icon: `${objectImageBase}object-144.webp` },
+  { name: '雨伞', icon: `${objectImageBase}object-145.webp` },
+  { name: '风车', icon: `${objectImageBase}object-146.webp` },
+  { name: '马扎', icon: `${objectImageBase}object-147.webp` },
+  { name: '马桶', icon: `${objectImageBase}object-148.webp` },
+  { name: '麦克风', icon: `${objectImageBase}object-149.webp` },
 ];
 
 const aliasMap: Record<string, string[]> = {
@@ -117,6 +169,16 @@ const aliasMap: Record<string, string[]> = {
   虾米: ['虾'],
   西蓝花: ['西兰花'],
   马甲: ['背心'],
+  书桌: ['桌子', '写字台'],
+  冰淇淋: ['冰激凌', '雪糕'],
+  吹风机: ['电吹风'],
+  大萝卜: ['萝卜'],
+  照相机: ['相机'],
+  电脑: ['计算机'],
+  箩筐: ['筐子', '篮子'],
+  铁锹: ['铁铲', '铲子'],
+  马扎: ['凳子'],
+  麦克风: ['话筒'],
 };
 
 const objectBank: Array<Omit<ObjectNamingQuestion, 'id'>> = objectItems.map((item) => ({
@@ -149,28 +211,27 @@ export function normalizeVisualAssetUrls(session: TrainingSession): void {
 }
 
 const oddBank = [
-  { prompt: '找出不一样的数字', itemLabel: '15', oddLabel: '12' },
-  { prompt: '找出不一样的数字', itemLabel: '68', oddLabel: '86' },
-  { prompt: '找出不一样的数字', itemLabel: '36', oddLabel: '38' },
-  { prompt: '找出不一样的数字', itemLabel: '909', oddLabel: '606' },
-  { prompt: '找出不一样的字母', itemLabel: 'T', oddLabel: '工' },
-  { prompt: '找出不一样的字母', itemLabel: 'E', oddLabel: 'F' },
-  { prompt: '找出不一样的字母', itemLabel: 'b', oddLabel: 'd' },
-  { prompt: '找出不一样的字母', itemLabel: 'p', oddLabel: 'q' },
-  { prompt: '找出不一样的汉字', itemLabel: '半', oddLabel: '羊' },
-  { prompt: '找出不一样的汉字', itemLabel: '日', oddLabel: '目' },
-  { prompt: '找出不一样的汉字', itemLabel: '土', oddLabel: '士' },
-  { prompt: '找出不一样的汉字', itemLabel: '末', oddLabel: '未' },
-  { prompt: '找出不一样的数字', itemLabel: '180', oddLabel: 'IBO' },
-  { prompt: '找出不一样的图形', itemLabel: '○', oddLabel: '□' },
-  { prompt: '找出不一样的图形', itemLabel: '△', oddLabel: '▽' },
-  { prompt: '找出不一样的图形', itemLabel: '+', oddLabel: '×' },
-  { prompt: '找出不一样的图形', itemLabel: '◇', oddLabel: '◆' },
-  { prompt: '找出不一样的方向', itemLabel: '→', oddLabel: '←' },
-  { prompt: '找出不一样的方向', itemLabel: '↑', oddLabel: '↓' },
-  { prompt: '找出不一样的方向', itemLabel: '↗', oddLabel: '↘' },
-  { prompt: '找出不一样的符号', itemLabel: '✓', oddLabel: '−' },
-  { prompt: '找出不一样的符号', itemLabel: '=', oddLabel: '≠' },
+  {
+    prompt: '找出方向不一样的手套',
+    itemLabel: '手套图一',
+    oddLabel: '手套图二',
+    itemImageUrl: `${oddOneOutImageBase}glove-1.webp`,
+    oddImageUrl: `${oddOneOutImageBase}glove-2.webp`,
+  },
+  {
+    prompt: '找出翅膀花纹不一样的蝴蝶',
+    itemLabel: '蝴蝶图一',
+    oddLabel: '蝴蝶图二',
+    itemImageUrl: `${oddOneOutImageBase}butterfly-1.webp`,
+    oddImageUrl: `${oddOneOutImageBase}butterfly-2.webp`,
+  },
+  {
+    prompt: '找出篮子里不一样的青菜',
+    itemLabel: '青菜图一',
+    oddLabel: '青菜图二',
+    itemImageUrl: `${oddOneOutImageBase}vegetable-1.webp`,
+    oddImageUrl: `${oddOneOutImageBase}vegetable-2.webp`,
+  },
 ];
 
 function randomId(prefix: string, index: number): string {
@@ -203,11 +264,27 @@ export function generateOddOneOutQuestions(count = 3): OddOneOutQuestion[] {
       const answerIndex = Math.floor(Math.random() * 9);
       return {
         id: randomId('odd', index),
-        ...item,
+        prompt: item.prompt,
+        itemLabel: item.itemLabel,
+        oddLabel: item.oddLabel,
+        contentType: 'image',
         answerIndex,
-        grid: Array.from({ length: 9 }, (_, gridIndex) => (gridIndex === answerIndex ? item.oddLabel : item.itemLabel)),
+        grid: Array.from({ length: 9 }, (_, gridIndex) =>
+          gridIndex === answerIndex ? item.oddImageUrl : item.itemImageUrl,
+        ),
       };
     });
+}
+
+export function isImageOddOneOutQuestion(question: OddOneOutQuestion): boolean {
+  return question.contentType === 'image';
+}
+
+export function oddOneOutChoiceLabel(question: OddOneOutQuestion, index: number): string {
+  if (question.contentType === 'image') {
+    return index === question.answerIndex ? question.oddLabel : question.itemLabel;
+  }
+  return question.grid[index] ?? '未记录';
 }
 
 export function normalizeAnswer(value: string): string {

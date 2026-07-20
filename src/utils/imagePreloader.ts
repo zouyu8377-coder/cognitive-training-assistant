@@ -25,6 +25,9 @@ function preloadImage(url: string): Promise<void> {
 export function collectTrainingImageUrls(session: TrainingSession): string[] {
   const urls = [
     ...(session.objectNamingQuestions ?? []).map((question) => question.icon),
+    ...(session.oddOneOutQuestions ?? []).flatMap((question) =>
+      question.contentType === 'image' ? question.grid : [],
+    ),
     session.shapeCopyTask?.referenceImageUrl,
   ];
 
